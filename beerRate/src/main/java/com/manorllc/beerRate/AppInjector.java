@@ -15,10 +15,13 @@ public class AppInjector extends AbstractModule {
     private final static int DEFAULT_PORT = 8080;
     private final static int PORT = CONFIG.getInteger(ConfigKeys.PORT).orElse(DEFAULT_PORT);
 
+    private final static Handlers HANDLERS = new Handlers();
+
     @Override
     protected void configure() {
         // bind(AbstractVerticle.class).to(Server.class);
-        bind(AbstractVerticle.class).toInstance(new Server(PORT));
+        bind(Handlers.class).toInstance(HANDLERS);
+        bind(AbstractVerticle.class).toInstance(new Server(PORT, HANDLERS));
     }
 
 }
