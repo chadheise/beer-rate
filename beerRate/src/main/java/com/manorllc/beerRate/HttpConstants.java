@@ -8,5 +8,6 @@ public final class HttpConstants {
     public static final String HEADER_VALUE_TEXT = "text/plain";
 
     public static final String PARAM_BEER = "beer";
+    public static final String PARAM_RATING = "rating";
 
 }

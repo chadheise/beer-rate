@@ -79,8 +79,38 @@ public class Handlers {
 
                 writeResponse(response, HttpStatus.SC_CREATED);
                 response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
-                response.end(bodyJson.encodePrettily());
+                response.end(Json.encodePrettily(beerRating));
             }
+        }
+    }
+
+    /**
+     * Puts a rating by processing an http GET request.
+     * 
+     * TODO: Refactor to merge duplicate code with putRating
+     * 
+     * @param routingContext
+     */
+    public void putRatingViaGet(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        String beerName = routingContext.request().getParam(HttpConstants.PARAM_BEER);
+        int rating = Integer.parseInt(routingContext.request().getParam(HttpConstants.PARAM_RATING));
+        if (0 > rating || rating > 5) {
+            writeResponse(response, HttpStatus.SC_BAD_REQUEST);
+            response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
+            response.end("Rating must be between 0 and 5");
+        } else {
+            Rating beerRating = new Rating();
+            beerRating.setBeer(beerName);
+            beerRating.setRating(rating);
+            beerRating.setTimestamp(new DateTime(DateTimeZone.UTC));
+
+            db.putRating(beerRating);
+
+            writeResponse(response, HttpStatus.SC_CREATED);
+            response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+            response.end(Json.encodePrettily(beerRating));
         }
     }
 

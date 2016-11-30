@@ -55,6 +55,11 @@ public class Server extends AbstractVerticle {
                 .handler(handlers::getRatings);
 
         router.route()
+                .method(HttpMethod.GET)
+                .path("/ratings/new/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
+                .handler(handlers::putRatingViaGet);
+
+        router.route()
                 .method(HttpMethod.PUT)
                 .path("/ratings")
                 .consumes(HttpConstants.HEADER_VALUE_JSON)
