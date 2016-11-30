@@ -47,7 +47,12 @@ public class Server extends AbstractVerticle {
         router.route()
                 .method(HttpMethod.GET)
                 .path("/ratings")
-                .handler(handlers::getBeers);
+                .handler(handlers::getAllRatings);
+
+        router.route()
+                .method(HttpMethod.GET)
+                .path("/ratings/:" + HttpConstants.PARAM_BEER)
+                .handler(handlers::getRatings);
 
         router.route()
                 .method(HttpMethod.PUT)
