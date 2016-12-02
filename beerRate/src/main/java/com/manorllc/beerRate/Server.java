@@ -46,7 +46,7 @@ public class Server extends AbstractVerticle {
 
         // Configure to serve static content
         router.route("/static/*")
-                .handler(StaticHandler.create("src/main/resources/static"));
+                .handler(StaticHandler.create("static"));
 
         router.get("/rate/:" + HttpConstants.PARAM_BEER)
                 .handler(handlers::mainUi);
