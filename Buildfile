@@ -1,1 +1,1 @@
-build: mvn assembly:assembly
+build: mvn -f beerRate/pom.xml assembly:assembly
