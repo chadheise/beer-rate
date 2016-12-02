@@ -63,7 +63,7 @@ public class Server extends AbstractVerticle {
 
         router.route()
                 .method(HttpMethod.GET)
-                .path("/ratings/new/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
+                .path("/ratings/add/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
                 .handler(handlers::putRatingViaGet);
 
         router.route()

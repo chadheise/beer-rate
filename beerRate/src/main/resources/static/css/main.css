@@ -1,9 +1,27 @@
 body {
-    background-color: #006400;
+	background-color: DarkGreen;
 }
 
-.ratingButton {
-	width = 80%;
-	background-color: yellow;
-	height = 70px;
+.container {
+	height: 90%;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.block {
+	display: inline-block;
+	width: 100%;
+}
+
+.button {
+	background-color: DarkRed;
+	border: none;
+	color: white;
+	margin: 20px 0px;
+	padding: 15px 0px;
+	text-align: center;
+	text-decoration: none;
+	font-size: 16px;
+	border-radius: 4px;
 }

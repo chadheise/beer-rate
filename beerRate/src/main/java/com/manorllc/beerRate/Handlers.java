@@ -27,11 +27,9 @@ public class Handlers {
     }
 
     public void mainUi(final RoutingContext routingContext) {
-        System.out.println("inside call");
         String beerName = routingContext.request().getParam(HttpConstants.PARAM_BEER);
-
-        // we define a hardcoded title for our application
-        routingContext.put("welcome", "Hi there!");
+        // Add beer directly for easier access in template
+        routingContext.put("beer", beerName);
 
         // and now delegate to the engine to render it.
         templateEngine.render(routingContext, "templates/mainUi.html", res -> {
