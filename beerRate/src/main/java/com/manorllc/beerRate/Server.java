@@ -16,14 +16,13 @@ public class Server extends AbstractVerticle {
     private final int port;
     private final Handlers handlers;
 
-    public Server(final int port, final Handlers handlers) {
+    public Server(final Vertx vertx, final int port, final Handlers handlers) {
+        this.vertx = vertx;
         this.port = port;
         this.handlers = handlers;
     }
 
     public void start() {
-        Vertx vertx = Vertx.vertx();
-
         HttpServer server = vertx.createHttpServer();
 
         Router router = Router.router(vertx);
@@ -43,6 +42,9 @@ public class Server extends AbstractVerticle {
         router.route()
                 .method(HttpMethod.PUT)
                 .handler(BodyHandler.create());
+
+        router.get("/ui")
+                .handler(handlers::mainUi);
 
         router.route()
                 .method(HttpMethod.GET)

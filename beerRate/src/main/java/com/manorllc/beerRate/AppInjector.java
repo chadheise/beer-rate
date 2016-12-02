@@ -9,6 +9,9 @@ import com.manorllc.beerRate.db.BeerRatingDatabase;
 import com.manorllc.beerRate.db.InMemoryBeerRatingDatabase;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Vertx;
+import io.vertx.ext.web.templ.TemplateEngine;
+import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 
 public class AppInjector extends AbstractModule {
 
@@ -18,13 +21,15 @@ public class AppInjector extends AbstractModule {
     private static final int PORT = CONFIG.getInteger(ConfigKeys.PORT).orElse(DEFAULT_PORT);
 
     private static final BeerRatingDatabase DB = new InMemoryBeerRatingDatabase();
-    private static final Handlers HANDLERS = new Handlers(DB);
+    private static final TemplateEngine TEMPLATE_ENGINE = ThymeleafTemplateEngine.create();
+
+    private static final Handlers HANDLERS = new Handlers(DB, TEMPLATE_ENGINE);
 
     @Override
     protected void configure() {
         // bind(AbstractVerticle.class).to(Server.class);
         bind(Handlers.class).toInstance(HANDLERS);
-        bind(AbstractVerticle.class).toInstance(new Server(PORT, HANDLERS));
+        bind(AbstractVerticle.class).toInstance(new Server(Vertx.vertx(), PORT, HANDLERS));
     }
 
 }
