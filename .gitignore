@@ -6,3 +6,4 @@
 .metadata
 .recommenders
 *.class
+.vertx

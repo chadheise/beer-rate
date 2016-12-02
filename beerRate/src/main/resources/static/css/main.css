@@ -1,0 +1,9 @@
+body {
+    background-color: #006400;
+}
+
+.ratingButton {
+	width = 80%;
+	background-color: yellow;
+	height = 70px;
+}

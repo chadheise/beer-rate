@@ -1,0 +1,21 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>So-So Beery Christmas</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link href="../static/css/main.css" rel="stylesheet" th:href="@{~/static/css/main.css}"
+	type="text/css" />
+
+</head>
+
+<body>
+	<h1 th:text="${context.request().getParam('beer')}"></h1>
+	<span class="ratingButton">1</span>
+	<span>2</span>
+	<span>3</span>
+	<span>4</span>
+	<span>5</span>
+</body>
+
+</html>

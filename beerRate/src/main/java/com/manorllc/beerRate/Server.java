@@ -8,6 +8,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 
 public class Server extends AbstractVerticle {
 
@@ -43,7 +44,11 @@ public class Server extends AbstractVerticle {
                 .method(HttpMethod.PUT)
                 .handler(BodyHandler.create());
 
-        router.get("/ui")
+        // Configure to serve static content
+        router.route("/static/*")
+                .handler(StaticHandler.create("src/main/resources/static"));
+
+        router.get("/rate/:" + HttpConstants.PARAM_BEER)
                 .handler(handlers::mainUi);
 
         router.route()
