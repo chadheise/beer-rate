@@ -17,6 +17,9 @@ import io.vertx.ext.web.RoutingContext;
 
 public class ApiHandlers {
 
+    private static final double MIN_RATING = 0;
+    private static final double MAX_RATING = 5;
+
     private final BeerRatingDatabase db;
 
     public ApiHandlers(final BeerRatingDatabase db) {
@@ -56,8 +59,8 @@ public class ApiHandlers {
             writeResponse(response, HttpResponseStatus.BAD_REQUEST);
             response.end();
         } else {
-            int rating = bodyJson.getInteger("rating");
-            if (0 > rating || rating > 5) {
+            double rating = bodyJson.getDouble("rating");
+            if (MIN_RATING > rating || rating > MAX_RATING) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
                 response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
                 response.end("Rating must be between 0 and 5");
@@ -74,6 +77,37 @@ public class ApiHandlers {
                 response.end(Json.encodePrettily(beerRating));
             }
         }
+    }
+
+    public void postRatingFromForm(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        routingContext.request().setExpectMultipart(true);
+        routingContext.request().endHandler(v -> {
+            String beerName = routingContext.request().formAttributes().get("beer");
+            double rating = Double.valueOf(routingContext.request().formAttributes().get("rating"));
+
+            if (MIN_RATING > rating || rating > MAX_RATING) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
+                response.end("Rating must be between 0 and 5");
+            } else {
+                // Put rating in DB
+                Rating beerRating = new Rating();
+                beerRating.setBeer(beerName);
+                beerRating.setRating(rating);
+                beerRating.setTimestamp(new DateTime(DateTimeZone.UTC));
+
+                db.putRating(beerRating);
+
+                // Redirect to stats page
+                routingContext.response().setStatusCode(HttpResponseStatus.FOUND.code());
+                String redirectUrl = String.format("/ui/stats/%s/%s", beerName, rating);
+                routingContext.response().headers().add("Location", redirectUrl);
+                routingContext.response().end();
+            }
+        });
+
     }
 
     /**

@@ -44,12 +44,14 @@ public class Server extends AbstractVerticle {
                 .method(HttpMethod.PUT)
                 .handler(BodyHandler.create());
 
-        // Configure to serve static content
         router.route("/static/*")
                 .handler(StaticHandler.create("static"));
 
-        router.get("/rate/:" + HttpConstants.PARAM_BEER)
-                .handler(uiHandlers::mainUi);
+        router.get("/ui/rate/:" + HttpConstants.PARAM_BEER)
+                .handler(uiHandlers::rateBeer);
+
+        router.get("/ui/stats/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
+                .handler(uiHandlers::beerStats);
 
         router.route()
                 .method(HttpMethod.GET)
@@ -63,7 +65,8 @@ public class Server extends AbstractVerticle {
 
         router.route()
                 .method(HttpMethod.GET)
-                .path("/ratings/add/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
+                .path("/ratings/add/:" + HttpConstants.PARAM_BEER + "/:" +
+                        HttpConstants.PARAM_RATING)
                 .handler(apiHandlers::putRatingViaGet);
 
         router.route()
@@ -72,5 +75,8 @@ public class Server extends AbstractVerticle {
                 .consumes(HttpConstants.HEADER_VALUE_JSON)
                 .produces(HttpConstants.HEADER_VALUE_JSON)
                 .handler(apiHandlers::putRating);
+
+        router.post("/forms/ratings")
+                .handler(apiHandlers::postRatingFromForm);
     }
 }

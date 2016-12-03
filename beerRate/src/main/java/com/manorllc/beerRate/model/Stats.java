@@ -10,7 +10,7 @@ public class Stats {
     private int min = 0;
     private int max = 0;
     private double mean = 0;
-    private int median = 0;
+    private double median = 0;
     // TODO: Consider adding a mode
 
     public int getMin() {
@@ -37,11 +37,11 @@ public class Stats {
         this.count = count;
     }
 
-    public int getMedian() {
+    public double getMedian() {
         return median;
     }
 
-    public void setMedian(int median) {
+    public void setMedian(double median) {
         this.median = median;
     }
 

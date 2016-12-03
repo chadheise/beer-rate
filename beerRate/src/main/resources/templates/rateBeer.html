@@ -1,0 +1,40 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>So-So Beery Christmas</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!--  <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript">google.load("jquery", "1.3.2");</script>  -->
+
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<link rel="stylesheet" href="../static/css/themes/Christmas.css" th:href="@{~/static/css/themes/Christmas.css}"/>
+<link rel="stylesheet" href="../static/css/themes/jquery.mobile.icons.min.css" th:href="@{~/static/css/themes/jquery.mobile.icons.min.css}"/>
+<script type="text/javascript" th:inline="javascript" th:src="@{~/static/js/forms.js}"></script>
+
+<link rel="stylesheet" href="../static/css/main.css" 
+	th:href="@{~/static/css/main.css}" type="text/css" />
+
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="block" th:text="${context.request().getParam('beer')}">Beer
+			name not found</h1>
+		<div>
+			<form id="newRatingForm" method="post" action="/forms/ratings">
+				<label for="rating" class="block">Rating:</label>
+				<input type="hidden" name="beer" th:value="${beer}">
+				<input type="range" name="rating" id="rating" value="2.5" min="0" max="5" step=".25">
+				<input type="submit" data-inline="true" value="Submit" class="ui-btn">
+			</form>
+		</div>
+	</div>
+</body>
+
+</html>

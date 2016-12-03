@@ -36,10 +36,10 @@ public class InMemoryBeerRatingDatabase implements BeerRatingDatabase {
             List<Rating> beerRatings = ratings.get(beerName);
             stats.setCount(beerRatings.size());
 
-            List<Integer> integerRatings = new ArrayList<>();
-            beerRatings.forEach(r -> integerRatings.add(r.getRating()));
-            int midPoint = integerRatings.size() / 2;
-            int median = integerRatings.get(midPoint);
+            List<Double> doubleRatings = new ArrayList<>();
+            beerRatings.forEach(r -> doubleRatings.add(r.getRating()));
+            int midPoint = doubleRatings.size() / 2;
+            double median = doubleRatings.get(midPoint);
             stats.setMedian(median);
 
             SynchronizedSummaryStatistics summaryStats = new SynchronizedSummaryStatistics();

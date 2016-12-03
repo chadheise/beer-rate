@@ -23,7 +23,7 @@ public class AppInjector extends AbstractModule {
     private static final TemplateEngine TEMPLATE_ENGINE = ThymeleafTemplateEngine.create();
 
     private static final ApiHandlers API_HANDLERS = new ApiHandlers(DB);
-    private static final UiHandlers UI_HANDLERS = new UiHandlers(TEMPLATE_ENGINE);
+    private static final UiHandlers UI_HANDLERS = new UiHandlers(TEMPLATE_ENGINE, DB);
 
     @Override
     protected void configure() {

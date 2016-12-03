@@ -2,6 +2,10 @@ body {
 	background-color: DarkGreen;
 }
 
+.hidden {
+	display: none;
+}
+
 .container {
 	height: 90%;
 	width: 90%;

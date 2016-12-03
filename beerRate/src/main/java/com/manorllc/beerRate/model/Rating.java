@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 public class Rating {
 
     private String beer;
-    private int rating;
+    private double rating;
     private DateTime timestamp;
 
     public String getBeer() {
@@ -19,11 +19,11 @@ public class Rating {
         this.beer = beer;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
