@@ -1,7 +1,6 @@
 package com.manorllc.beerRate;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.logging.Logger;
@@ -18,8 +17,7 @@ public class Server extends AbstractVerticle {
     private final ApiHandlers apiHandlers;
     private final UiHandlers uiHandlers;
 
-    public Server(final Vertx vertx, final int port, final ApiHandlers apiHandlers, final UiHandlers uiHandlers) {
-        this.vertx = vertx;
+    public Server(final int port, final ApiHandlers apiHandlers, final UiHandlers uiHandlers) {
         this.port = port;
         this.apiHandlers = apiHandlers;
         this.uiHandlers = uiHandlers;

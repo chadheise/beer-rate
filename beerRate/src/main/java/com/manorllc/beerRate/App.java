@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -19,6 +20,6 @@ public class App {
         Injector injector = Guice.createInjector(new AppInjector());
 
         AbstractVerticle server = injector.getInstance(AbstractVerticle.class);
-        server.start();
+        Vertx.vertx().deployVerticle(server);
     }
 }

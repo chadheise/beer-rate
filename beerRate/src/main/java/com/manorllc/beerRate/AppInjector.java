@@ -9,7 +9,6 @@ import com.manorllc.beerRate.db.BeerRatingDatabase;
 import com.manorllc.beerRate.db.InMemoryBeerRatingDatabase;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Vertx;
 import io.vertx.ext.web.templ.TemplateEngine;
 import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 
@@ -30,7 +29,7 @@ public class AppInjector extends AbstractModule {
     protected void configure() {
         // bind(AbstractVerticle.class).to(Server.class);
         bind(ApiHandlers.class).toInstance(API_HANDLERS);
-        bind(AbstractVerticle.class).toInstance(new Server(Vertx.vertx(), PORT, API_HANDLERS, UI_HANDLERS));
+        bind(AbstractVerticle.class).toInstance(new Server(PORT, API_HANDLERS, UI_HANDLERS));
     }
 
 }
