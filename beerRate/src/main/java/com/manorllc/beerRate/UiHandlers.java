@@ -38,18 +38,13 @@ public class UiHandlers {
         routingContext.put("beer", beerName);
         routingContext.put("rating", rating);
 
-        System.out.println("beer: " + beerName);
-        System.out.println("rating: " + rating);
-
         Optional<Stats> stats = db.getStats(beerName);
         if (stats.isPresent()) {
-            System.out.println("stats is present");
             routingContext.put("averageRating", stats.get().getMean());
             routingContext.put("numberOfRatings", stats.get().getCount());
             routingContext.put("stats", stats.get());
 
         }
-        System.out.println("here");
 
         templateEngine.render(routingContext, "templates/beerStats.html", res -> {
             if (res.succeeded()) {
@@ -58,7 +53,6 @@ public class UiHandlers {
                 routingContext.fail(res.cause());
             }
         });
-
     }
 
 }

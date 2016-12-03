@@ -37,7 +37,7 @@ public class Server extends AbstractVerticle {
 
     }
 
-    public void registerHandlers(final Router router) {
+    private void registerHandlers(final Router router) {
         // Pass all PUT requests through a body handler for easier parsing of
         // the body
         router.route()
@@ -53,25 +53,13 @@ public class Server extends AbstractVerticle {
         router.get("/ui/stats/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
                 .handler(uiHandlers::beerStats);
 
-        router.route()
-                .method(HttpMethod.GET)
-                .path("/ratings")
+        router.get("/ratings")
                 .handler(apiHandlers::getAllRatings);
 
-        router.route()
-                .method(HttpMethod.GET)
-                .path("/ratings/:" + HttpConstants.PARAM_BEER)
+        router.get("/ratings/:" + HttpConstants.PARAM_BEER)
                 .handler(apiHandlers::getRatings);
 
-        router.route()
-                .method(HttpMethod.GET)
-                .path("/ratings/add/:" + HttpConstants.PARAM_BEER + "/:" +
-                        HttpConstants.PARAM_RATING)
-                .handler(apiHandlers::putRatingViaGet);
-
-        router.route()
-                .method(HttpMethod.PUT)
-                .path("/ratings")
+        router.put("/ratings")
                 .consumes(HttpConstants.HEADER_VALUE_JSON)
                 .produces(HttpConstants.HEADER_VALUE_JSON)
                 .handler(apiHandlers::putRating);

@@ -27,7 +27,6 @@ public class AppInjector extends AbstractModule {
 
     @Override
     protected void configure() {
-        // bind(AbstractVerticle.class).to(Server.class);
         bind(ApiHandlers.class).toInstance(API_HANDLERS);
         bind(AbstractVerticle.class).toInstance(new Server(PORT, API_HANDLERS, UI_HANDLERS));
     }
