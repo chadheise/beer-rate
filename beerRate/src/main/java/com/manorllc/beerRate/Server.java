@@ -15,12 +15,14 @@ public class Server extends AbstractVerticle {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
     private final int port;
-    private final Handlers handlers;
+    private final ApiHandlers apiHandlers;
+    private final UiHandlers uiHandlers;
 
-    public Server(final Vertx vertx, final int port, final Handlers handlers) {
+    public Server(final Vertx vertx, final int port, final ApiHandlers apiHandlers, final UiHandlers uiHandlers) {
         this.vertx = vertx;
         this.port = port;
-        this.handlers = handlers;
+        this.apiHandlers = apiHandlers;
+        this.uiHandlers = uiHandlers;
     }
 
     public void start() {
@@ -49,28 +51,28 @@ public class Server extends AbstractVerticle {
                 .handler(StaticHandler.create("static"));
 
         router.get("/rate/:" + HttpConstants.PARAM_BEER)
-                .handler(handlers::mainUi);
+                .handler(uiHandlers::mainUi);
 
         router.route()
                 .method(HttpMethod.GET)
                 .path("/ratings")
-                .handler(handlers::getAllRatings);
+                .handler(apiHandlers::getAllRatings);
 
         router.route()
                 .method(HttpMethod.GET)
                 .path("/ratings/:" + HttpConstants.PARAM_BEER)
-                .handler(handlers::getRatings);
+                .handler(apiHandlers::getRatings);
 
         router.route()
                 .method(HttpMethod.GET)
                 .path("/ratings/add/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
-                .handler(handlers::putRatingViaGet);
+                .handler(apiHandlers::putRatingViaGet);
 
         router.route()
                 .method(HttpMethod.PUT)
                 .path("/ratings")
                 .consumes(HttpConstants.HEADER_VALUE_JSON)
                 .produces(HttpConstants.HEADER_VALUE_JSON)
-                .handler(handlers::putRating);
+                .handler(apiHandlers::putRating);
     }
 }

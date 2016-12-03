@@ -14,32 +14,13 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.templ.TemplateEngine;
 
-public class Handlers {
+public class ApiHandlers {
 
     private final BeerRatingDatabase db;
-    private final TemplateEngine templateEngine;
 
-    public Handlers(final BeerRatingDatabase db, final TemplateEngine templateEngine) {
+    public ApiHandlers(final BeerRatingDatabase db) {
         this.db = db;
-        this.templateEngine = templateEngine;
-    }
-
-    public void mainUi(final RoutingContext routingContext) {
-        String beerName = routingContext.request().getParam(HttpConstants.PARAM_BEER);
-        // Add beer directly for easier access in template
-        routingContext.put("beer", beerName);
-
-        // and now delegate to the engine to render it.
-        templateEngine.render(routingContext, "templates/mainUi.html", res -> {
-            if (res.succeeded()) {
-                routingContext.response().end(res.result());
-            } else {
-                System.out.println(res.cause());
-                routingContext.fail(res.cause());
-            }
-        });
     }
 
     public void getRatings(final RoutingContext routingContext) {

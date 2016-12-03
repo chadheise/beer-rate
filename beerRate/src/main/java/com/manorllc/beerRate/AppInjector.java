@@ -23,13 +23,14 @@ public class AppInjector extends AbstractModule {
     private static final BeerRatingDatabase DB = new InMemoryBeerRatingDatabase();
     private static final TemplateEngine TEMPLATE_ENGINE = ThymeleafTemplateEngine.create();
 
-    private static final Handlers HANDLERS = new Handlers(DB, TEMPLATE_ENGINE);
+    private static final ApiHandlers API_HANDLERS = new ApiHandlers(DB);
+    private static final UiHandlers UI_HANDLERS = new UiHandlers(TEMPLATE_ENGINE);
 
     @Override
     protected void configure() {
         // bind(AbstractVerticle.class).to(Server.class);
-        bind(Handlers.class).toInstance(HANDLERS);
-        bind(AbstractVerticle.class).toInstance(new Server(Vertx.vertx(), PORT, HANDLERS));
+        bind(ApiHandlers.class).toInstance(API_HANDLERS);
+        bind(AbstractVerticle.class).toInstance(new Server(Vertx.vertx(), PORT, API_HANDLERS, UI_HANDLERS));
     }
 
 }
