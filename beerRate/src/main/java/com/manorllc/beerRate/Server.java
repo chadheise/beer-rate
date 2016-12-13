@@ -53,6 +53,9 @@ public class Server extends AbstractVerticle {
         router.get("/ui/stats/:" + HttpConstants.PARAM_BEER + "/:" + HttpConstants.PARAM_RATING)
                 .handler(uiHandlers::beerStats);
 
+        router.get("/users")
+                .handler(apiHandlers::getAllUsers);
+
         router.get("/ratings")
                 .handler(apiHandlers::getAllRatings);
 

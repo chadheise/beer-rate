@@ -1,5 +1,7 @@
 package com.manorllc.beerRate;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import com.manorllc.beerRate.db.Database;
@@ -23,6 +25,25 @@ public class ApiHandlers {
     public ApiHandlers(final Database db, final DatabaseQueries queries) {
         this.db = db;
         this.queries = queries;
+    }
+
+    public void getAllUsers(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        writeResponse(response, HttpResponseStatus.OK);
+        Collection<JsonObject> userCollection = new HashSet<>();
+        db.getUsersByTeam().entrySet().forEach(entry -> {
+            entry.getValue().forEach(u -> {
+                JsonObject j = new JsonObject();
+                j.put("firstName", u.getFirstName());
+                j.put("lastName", u.getLastName());
+                j.put("generation", u.getGeneration());
+                j.put("team", entry.getKey());
+                userCollection.add(j);
+            });
+
+        });
+        response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+        response.end(Json.encodePrettily(userCollection));
     }
 
     public void getRatings(final RoutingContext routingContext) {
