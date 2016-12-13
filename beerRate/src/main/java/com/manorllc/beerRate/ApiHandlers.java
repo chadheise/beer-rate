@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import com.manorllc.beerRate.db.BeerRatingDatabase;
-import com.manorllc.beerRate.model.Rating;
+import com.manorllc.beerRate.db.DbRating;
 import com.manorllc.beerRate.model.Stats;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -65,7 +65,7 @@ public class ApiHandlers {
                 response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
                 response.end("Rating must be between 0 and 5");
             } else {
-                Rating beerRating = new Rating();
+                DbRating beerRating = new DbRating();
                 beerRating.setBeer(bodyJson.getString("beer"));
                 beerRating.setRating(rating);
                 beerRating.setCreated(new DateTime(DateTimeZone.UTC));
@@ -93,7 +93,7 @@ public class ApiHandlers {
                 response.end("Rating must be between 0 and 5");
             } else {
                 // Put rating in DB
-                Rating beerRating = new Rating();
+                DbRating beerRating = new DbRating();
                 beerRating.setBeer(beerName);
                 beerRating.setRating(rating);
                 beerRating.setCreated(new DateTime(DateTimeZone.UTC));

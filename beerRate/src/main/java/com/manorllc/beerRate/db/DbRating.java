@@ -1,17 +1,17 @@
-package com.manorllc.beerRate.model;
+package com.manorllc.beerRate.db;
 
 import org.joda.time.DateTime;
 
 /**
  * Pojo representing a beer rating.
  */
-public class Rating {
+public class DbRating {
 
     private double rating;
     private DateTime created;
     private DateTime updated;
 
-    public Rating(final double rating, final DateTime created) {
+    public DbRating(final double rating, final DateTime created) {
         this.rating = rating;
         this.created = created;
         this.updated = created;

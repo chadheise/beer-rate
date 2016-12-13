@@ -1,6 +1,8 @@
-package com.manorllc.beerRate.model;
+package com.manorllc.beerRate.db;
 
-public class User {
+import com.manorllc.beerRate.model.Generation;
+
+public class DbUser {
 
     private String firstName;
     private String lastName;
