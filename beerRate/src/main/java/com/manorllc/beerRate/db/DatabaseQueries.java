@@ -10,11 +10,11 @@ import org.apache.commons.math3.stat.descriptive.SynchronizedSummaryStatistics;
 
 import com.manorllc.beerRate.model.Stats;
 
-public class DbQueries {
+public class DatabaseQueries {
 
     private final Database db;
 
-    public DbQueries(final Database db) {
+    public DatabaseQueries(final Database db) {
         this.db = db;
     }
 
