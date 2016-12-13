@@ -28,6 +28,9 @@ public class DatabaseInitializer {
         LOGGER.info("Initializing database with team membership");
         Parsers.parseTeamMembership(ROOT_DIR + "teamMembership.json", db);
 
+        LOGGER.info("Initializing database with beers");
+        Parsers.parseBeers(ROOT_DIR + "beers.json", db);
+
     }
 
 }

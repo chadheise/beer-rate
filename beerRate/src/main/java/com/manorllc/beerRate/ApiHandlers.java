@@ -27,6 +27,13 @@ public class ApiHandlers {
         this.queries = queries;
     }
 
+    public void getAllBeers(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        writeResponse(response, HttpResponseStatus.OK);
+        response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+        response.end(Json.encodePrettily(db.getBeersByCategory()));
+    }
+
     public void getAllUsers(final RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);

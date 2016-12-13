@@ -1,0 +1,50 @@
+{
+	"Lagers & Pilsners": [
+		{
+			"name": "Pilsner Urquel",
+			"style": "European Pilsner"
+		}
+	],
+	"Belgian": [
+		{
+			"name": "Duvel",
+			"style": "Strong ale"
+		},
+		{
+			"name": "Chimay Red",
+			"style": "Dubbel"
+		},
+		{
+			"name": "Tripel Karmeleit",
+			"style": "Trippel"
+		},
+		{
+			"name": "St. Bernardus ABT12",
+			"style": "Quad"
+		}
+	],
+	"Sours, Fruits, & Flavors": [
+	],
+	"Wheat": [
+		{
+			"name": "Heiseweisen",
+			"style": "Homebrew"
+		}
+	],
+	"Pale Ales": [
+		{
+			"name": "Field to Ferment Simcoe",
+			"style": "American Fresh Hop Pale Ale"
+		},
+		{
+			"name": "Goose Island Goose IPA",
+			"style": "English IPA"
+		}
+	],
+	"Stouts, Porters & Dark Ales": [
+		{
+			"name": "Guiness Draught",
+			"style": "Irish Stout"
+		}
+	]
+}

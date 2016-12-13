@@ -9,9 +9,11 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import com.manorllc.beerRate.db.Database;
+import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Generation;
 
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -66,6 +68,25 @@ public class Parsers {
                 String firstName = userName.split(" ")[0];
                 String lastName = userName.split(" ")[1];
                 db.addUserToTeam(teamName, firstName, lastName);
+            });
+        });
+    }
+
+    public static void parseBeers(final String filePath, final Database db) throws IOException {
+        Path path = Paths.get(new File(filePath).toURI());
+        byte[] bytes = Files.readAllBytes(path);
+        String string = new String(bytes);
+        JsonObject json = new JsonObject(string);
+        json.stream().forEach(entry -> {
+            String categoryName = entry.getKey();
+            if (!db.categoryExists(categoryName)) {
+                db.addCategory(categoryName);
+            }
+
+            JsonArray beers = json.getJsonArray(categoryName);
+            beers.forEach(obj -> {
+                DbBeer dbBeer = Json.decodeValue(obj.toString(), DbBeer.class);
+                db.addBeer(categoryName, dbBeer);
             });
         });
     }
