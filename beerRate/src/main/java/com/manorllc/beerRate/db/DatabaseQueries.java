@@ -42,7 +42,7 @@ public class DatabaseQueries {
         }
     }
 
-    public Optional<Stats> getStatsForAll() {
+    public Stats getStatsForAll() {
         Collection<DbBeer> beers = new HashSet<>();
         db.getBeersByCategory().values().forEach(col -> {
             beers.addAll(col);
@@ -54,7 +54,7 @@ public class DatabaseQueries {
         });
 
         Stats stats = getStats(ratings);
-        return Optional.of(stats);
+        return stats;
 
     }
 
@@ -64,9 +64,11 @@ public class DatabaseQueries {
 
         List<Double> doubleRatings = new ArrayList<>();
         ratings.forEach(r -> doubleRatings.add(r.getRating()));
-        int midPoint = doubleRatings.size() / 2;
-        double median = doubleRatings.get(midPoint);
-        stats.setMedian(median);
+        if (!doubleRatings.isEmpty()) {
+            int midPoint = doubleRatings.size() / 2;
+            double median = doubleRatings.get(midPoint);
+            stats.setMedian(median);
+        }
 
         SynchronizedSummaryStatistics summaryStats = new SynchronizedSummaryStatistics();
         ratings.forEach(r -> summaryStats.addValue((double) r.getRating()));
