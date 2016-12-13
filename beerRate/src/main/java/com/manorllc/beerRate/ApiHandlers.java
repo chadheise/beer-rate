@@ -2,11 +2,8 @@ package com.manorllc.beerRate;
 
 import java.util.Optional;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-import com.manorllc.beerRate.db.BeerRatingDatabase;
-import com.manorllc.beerRate.db.DbRating;
+import com.manorllc.beerRate.db.Database;
+import com.manorllc.beerRate.db.DatabaseQueries;
 import com.manorllc.beerRate.model.Stats;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -20,10 +17,12 @@ public class ApiHandlers {
     private static final double MIN_RATING = 0;
     private static final double MAX_RATING = 5;
 
-    private final BeerRatingDatabase db;
+    private final Database db;
+    private final DatabaseQueries queries;
 
-    public ApiHandlers(final BeerRatingDatabase db) {
+    public ApiHandlers(final Database db, final DatabaseQueries queries) {
         this.db = db;
+        this.queries = queries;
     }
 
     public void getRatings(final RoutingContext routingContext) {
@@ -31,7 +30,7 @@ public class ApiHandlers {
 
         String beerName = routingContext.request().getParam(HttpConstants.PARAM_BEER);
 
-        Optional<Stats> stats = db.getStats(beerName);
+        Optional<Stats> stats = queries.getStatsForBeer(beerName);
         if (stats.isPresent()) {
             writeResponse(response, HttpResponseStatus.OK);
             response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
@@ -47,13 +46,16 @@ public class ApiHandlers {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
         response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
-        response.end(Json.encodePrettily(db.getAllStats()));
+        response.end(Json.encodePrettily(queries.getStatsForAll()));
     }
 
     public void putRating(final RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
 
         JsonObject bodyJson = routingContext.getBodyAsJson();
+
+        String firstName = routingContext.request().getParam(HttpConstants.PARAM_FIRST_NAME);
+        String lastName = routingContext.request().getParam(HttpConstants.PARAM_LAST_NAME);
 
         if (!bodyJson.containsKey("beer") || !bodyJson.containsKey("rating")) {
             writeResponse(response, HttpResponseStatus.BAD_REQUEST);
@@ -65,16 +67,10 @@ public class ApiHandlers {
                 response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
                 response.end("Rating must be between 0 and 5");
             } else {
-                DbRating beerRating = new DbRating();
-                beerRating.setBeer(bodyJson.getString("beer"));
-                beerRating.setRating(rating);
-                beerRating.setCreated(new DateTime(DateTimeZone.UTC));
-
-                db.putRating(beerRating);
+                db.addRating(firstName, lastName, bodyJson.getString("beer"), rating);
 
                 writeResponse(response, HttpResponseStatus.CREATED);
-                response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
-                response.end(Json.encodePrettily(beerRating));
+                response.end();
             }
         }
     }
@@ -84,6 +80,10 @@ public class ApiHandlers {
 
         routingContext.request().setExpectMultipart(true);
         routingContext.request().endHandler(v -> {
+            String userName = routingContext.request().formAttributes().get("name");
+            String firstName = userName.split(" ")[0];
+            String lastName = userName.split(" ")[1];
+
             String beerName = routingContext.request().formAttributes().get("beer");
             double rating = Double.valueOf(routingContext.request().formAttributes().get("rating"));
 
@@ -93,12 +93,7 @@ public class ApiHandlers {
                 response.end("Rating must be between 0 and 5");
             } else {
                 // Put rating in DB
-                DbRating beerRating = new DbRating();
-                beerRating.setBeer(beerName);
-                beerRating.setRating(rating);
-                beerRating.setCreated(new DateTime(DateTimeZone.UTC));
-
-                db.putRating(beerRating);
+                db.addRating(firstName, lastName, beerName, rating);
 
                 // Redirect to stats page
                 routingContext.response().setStatusCode(HttpResponseStatus.FOUND.code());

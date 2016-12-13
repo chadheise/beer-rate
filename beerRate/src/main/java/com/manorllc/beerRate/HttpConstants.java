@@ -9,5 +9,7 @@ public final class HttpConstants {
 
     public static final String PARAM_BEER = "beer";
     public static final String PARAM_RATING = "rating";
+    public static final String PARAM_FIRST_NAME = "firstName";
+    public static final String PARAM_LAST_NAME = "lastName";
 
 }

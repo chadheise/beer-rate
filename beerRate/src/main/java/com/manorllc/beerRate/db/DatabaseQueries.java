@@ -42,6 +42,22 @@ public class DatabaseQueries {
         }
     }
 
+    public Optional<Stats> getStatsForAll() {
+        Collection<DbBeer> beers = new HashSet<>();
+        db.getBeersByCategory().values().forEach(col -> {
+            beers.addAll(col);
+        });
+
+        Collection<DbRating> ratings = new HashSet<>();
+        beers.forEach(beer -> {
+            ratings.addAll(db.getRatingsForBeer(beer.getName()).values());
+        });
+
+        Stats stats = getStats(ratings);
+        return Optional.of(stats);
+
+    }
+
     private Stats getStats(final Collection<DbRating> ratings) {
         Stats stats = new Stats();
         stats.setCount(ratings.size());
