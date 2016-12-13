@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
@@ -34,7 +35,7 @@ public class Database {
     private Map<UUID, Map<UUID, UUID>> userRatings = new HashMap<>();
 
     // Team ID -> Collection of User IDs
-    private Map<UUID, Collection<UUID>> usersByTeam = new HashMap<>();
+    private Map<UUID, Set<UUID>> usersByTeam = new HashMap<>();
 
     public Optional<UUID> getCategoryId(final String categoryName) {
         for (Entry<UUID, DbCategory> categoryEntry : categories.entrySet()) {
@@ -155,13 +156,7 @@ public class Database {
         return Optional.empty();
     }
 
-    public void addUser(final String teamName, final DbUser user) {
-        Optional<UUID> teamOpt = getCategoryId(teamName);
-        if (!teamOpt.isPresent()) {
-            throw new RuntimeException(String.format("Team %s does not exists", teamName));
-        }
-        UUID teamId = teamOpt.get();
-
+    public void addUser(final DbUser user) {
         if (userExists(user.getFirstName(), user.getLastName())) {
             // TODO: Consider overwriting
             throw new RuntimeException(
@@ -169,7 +164,6 @@ public class Database {
         } else {
             UUID userId = UUID.randomUUID();
             users.put(userId, user);
-            usersByTeam.get(teamId).add(userId);
         }
     }
 
@@ -181,6 +175,62 @@ public class Database {
         return Optional.empty();
     }
 
+    public void addUserToTeam(final String teamName, final String firstName, final String lastName) {
+        Optional<UUID> userIdOpt = getUserId(firstName, lastName);
+        if (!userIdOpt.isPresent()) {
+            throw new RuntimeException(String.format("User %s %s does not exists", firstName, lastName));
+        }
+        UUID userId = userIdOpt.get();
+        Optional<UUID> teamIdOpt = getTeamId(teamName);
+        if (!teamIdOpt.isPresent()) {
+            throw new RuntimeException(String.format("Team %s does not exists", teamName));
+        }
+        UUID teamId = teamIdOpt.get();
+
+        // Check if user belongs to another team
+        Optional<String> teamOpt = getTeamForUser(firstName, lastName);
+        if (teamOpt.isPresent()) {
+            throw new RuntimeException(String.format("User %s %s already belongs to team %s", firstName,
+                    lastName, teamOpt.get()));
+        }
+
+        usersByTeam.get(teamId).add(userId);
+    }
+
+    public void removeUserFromTeam(final String firstName, final String lastName) {
+        Optional<String> teamOpt = getTeamForUser(firstName, lastName);
+        if (!teamOpt.isPresent()) {
+            throw new RuntimeException(String.format("User %s %s is not on a team", firstName,
+                    lastName));
+        }
+        UUID teamId = getTeamId(teamOpt.get()).get();
+        UUID thisUserId = getUserId(firstName, lastName).get();
+
+        usersByTeam.get(teamId).forEach(userId -> {
+            if (userId.equals(thisUserId)) {
+                usersByTeam.get(teamId).remove(thisUserId);
+            }
+        });
+    }
+
+    public Optional<String> getTeamForUser(final String firstName, final String lastName) {
+        Optional<UUID> userIdOpt = getUserId(firstName, lastName);
+        if (!userIdOpt.isPresent()) {
+            throw new RuntimeException(String.format("User %s %s does not exists", firstName, lastName));
+        }
+        UUID userId = userIdOpt.get();
+
+        for (Entry<UUID, Set<UUID>> entry : usersByTeam.entrySet()) {
+            UUID currentTeamId = entry.getKey();
+            for (UUID currentUserId : entry.getValue()) {
+                if (currentUserId.equals(userId)) {
+                    return Optional.of(teams.get(currentTeamId).getName());
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     /**
      * Returns a map of team -> collection of users on that team
      * 
@@ -188,7 +238,7 @@ public class Database {
      */
     public Map<String, Collection<DbUser>> getUsersByTeam() {
         Map<String, Collection<DbUser>> userMap = new HashMap<>();
-        for (Entry<UUID, Collection<UUID>> entry : usersByTeam.entrySet()) {
+        for (Entry<UUID, Set<UUID>> entry : usersByTeam.entrySet()) {
             UUID teamId = entry.getKey();
             String teamName = teams.get(teamId).getName();
             userMap.put(teamName, getUsersForTeam(teamName));

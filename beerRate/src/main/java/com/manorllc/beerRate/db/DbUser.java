@@ -8,6 +8,12 @@ public class DbUser {
     private String lastName;
     private Generation generation;
 
+    public DbUser(final String firstName, final String lastName, final Generation generation) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.generation = generation;
+    }
+
     public String getFirstName() {
         return firstName;
     }
