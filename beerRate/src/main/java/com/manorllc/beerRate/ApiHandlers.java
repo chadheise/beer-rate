@@ -68,7 +68,7 @@ public class ApiHandlers {
                 Rating beerRating = new Rating();
                 beerRating.setBeer(bodyJson.getString("beer"));
                 beerRating.setRating(rating);
-                beerRating.setTimestamp(new DateTime(DateTimeZone.UTC));
+                beerRating.setCreated(new DateTime(DateTimeZone.UTC));
 
                 db.putRating(beerRating);
 
@@ -96,7 +96,7 @@ public class ApiHandlers {
                 Rating beerRating = new Rating();
                 beerRating.setBeer(beerName);
                 beerRating.setRating(rating);
-                beerRating.setTimestamp(new DateTime(DateTimeZone.UTC));
+                beerRating.setCreated(new DateTime(DateTimeZone.UTC));
 
                 db.putRating(beerRating);
 
