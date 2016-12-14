@@ -17,8 +17,10 @@ $(document).ready(function() {
 		$('#summaryStyle').attr('href',stylesheet);
 	}
 	
+	refresh();
+	
 	setInterval ( function() {
 		refresh();
-	}, 5000 );
+	}, 50000 );
 	
 });

@@ -1,17 +1,18 @@
 <div class="container">
     <h1 class="block" >Beery Christmas!</h1>
-    <div class="category">
-    <h2>Category</h2>
-    <ol>
-        <li>
-            <div>
-                <h3>Beer Name</h3>
-                <p>Brewery: Some brewery</p>
-                <p>Style: Some Style</p>
-                <p>Rating</p>
-                <p>Count</p>
-            </div>
+    
+    <div class="category" th:each="beersByCategory : ${beersByCategory}" >
+        <h2 th:text="${beersByCategory.key}">Category</h2>    
+        <ul>
+            <li th:each="beer : ${beersByCategory.value}">
+                <div class="beerDiv">
+                    <h3 th:text="${beer.name}">Beer Name</h3>
+                    <p class="brewery" th:text="${beer.brewery}">Some brewery</p>
+                    <p class="beerStyle" th:text="${beer.style}">Some Style</p>
+                    <p th:text="|Avg. Rating: ${beerStats['__${beer.name}__'].mean}|">Rating: </p>
+                    <p th:text="|Num. Ratings: ${beerStats['__${beer.name}__'].count}|">Rating: </p>
+                </div>
 	       </li>
-        </ol>
+        </ul>
     </div>
 </div>

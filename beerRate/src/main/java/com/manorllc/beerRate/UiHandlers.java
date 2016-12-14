@@ -1,11 +1,15 @@
 package com.manorllc.beerRate;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
+import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Stats;
 
@@ -83,6 +87,21 @@ public class UiHandlers {
     }
 
     public void summaryBody(final RoutingContext ctx) {
+        Map<String, Object> overallMap = new HashMap<>();
+        Stats overallStats = queries.getStatsForAll();
+        overallMap.put("stats", overallStats);
+
+        Map<String, Collection<DbBeer>> beersByCategory = db.getBeersByCategory();
+        ctx.put("beersByCategory", beersByCategory);
+
+        Map<String, Stats> beerStats = new HashMap<>();
+        Collection<DbBeer> beers = beersByCategory.values().stream().flatMap(b -> b.stream())
+                .collect(Collectors.toList());
+        for (DbBeer beer : beers) {
+            beerStats.put(beer.getName(), queries.getStatsForBeer(beer.getName()).get());
+        }
+        ctx.put("beerStats", beerStats);
+
         templateEngine.render(ctx, "templates/summaryBody.html", res -> {
             if (res.succeeded()) {
                 ctx.response().end(res.result());
