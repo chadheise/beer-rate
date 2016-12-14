@@ -3,6 +3,7 @@ package com.manorllc.beerRate.db;
 public class DbBeer {
 
     private String name;
+    private String brewery;
     private String style;
 
     public String getName() {
@@ -11,6 +12,14 @@ public class DbBeer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBrewery() {
+        return brewery;
+    }
+
+    public void setBrewery(String brewery) {
+        this.brewery = brewery;
     }
 
     public String getStyle() {

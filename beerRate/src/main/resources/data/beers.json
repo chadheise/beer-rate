@@ -2,24 +2,29 @@
 	"Lagers & Pilsners": [
 		{
 			"name": "Pilsner Urquel",
+			"brewery": "Pilsner Urquell Brewery",
 			"style": "European Pilsner"
 		}
 	],
 	"Belgian": [
 		{
 			"name": "Duvel",
+			"brewery": "Brouwerij Duvel Moortgat NV",
 			"style": "Strong ale"
 		},
 		{
-			"name": "Chimay Red",
+			"name": "Chimay Premiere (Red)",
+			"brewery": "Bieres de Chimay",
 			"style": "Dubbel"
 		},
 		{
-			"name": "Tripel Karmeleit",
+			"name": "Tripel Karmeliet",
+			"brewery": "Brouwerij Bosteels",
 			"style": "Trippel"
 		},
 		{
-			"name": "St. Bernardus ABT12",
+			"name": "St. Bernardus Abt 12",
+			"brewery": "Brouwerij St. Bernardus NV",
 			"style": "Quad"
 		}
 	],
@@ -28,22 +33,26 @@
 	"Wheat": [
 		{
 			"name": "Heiseweisen",
+			"brewery": "Heise Brewing Co.",
 			"style": "Homebrew"
 		}
 	],
 	"Pale Ales": [
 		{
-			"name": "Field to Ferment Simcoe",
+			"name": "Field To Ferment: Simcoe",
+			"brewery": "Fremont Brewing Company",
 			"style": "American Fresh Hop Pale Ale"
 		},
 		{
-			"name": "Goose Island Goose IPA",
+			"name": "Goose IPA",
+			"brewery": "Goose Island Beer Co.",
 			"style": "English IPA"
 		}
 	],
 	"Stouts, Porters & Dark Ales": [
 		{
-			"name": "Guiness Draught",
+			"name": "Guinness Draught",
+			"brewery": "Guinness Ltd.",
 			"style": "Irish Stout"
 		}
 	]

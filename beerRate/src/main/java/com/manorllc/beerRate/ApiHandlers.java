@@ -108,9 +108,9 @@ public class ApiHandlers {
 
         routingContext.request().setExpectMultipart(true);
         routingContext.request().endHandler(v -> {
-            String userName = routingContext.request().formAttributes().get("name");
-            String firstName = userName.split(" ")[0];
-            String lastName = userName.split(" ")[1];
+            String userName = routingContext.request().formAttributes().get("user");
+            String firstName = userName.split(",")[1].trim();
+            String lastName = userName.split(",")[0].trim();
 
             String beerName = routingContext.request().formAttributes().get("beer");
             double rating = Double.valueOf(routingContext.request().formAttributes().get("rating"));
