@@ -27,6 +27,7 @@ public class App {
         Database database = injector.getInstance(Database.class);
 
         LOGGER.info("Initializing database");
+
         DatabaseInitializer.init(database);
         LOGGER.info("Finished initializing database");
 
