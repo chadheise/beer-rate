@@ -1,12 +1,18 @@
 package com.manorllc.beerRate;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
+import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbRating;
 import com.manorllc.beerRate.model.Stats;
 
@@ -146,11 +152,37 @@ public class ApiHandlers {
 
     }
 
-    public void getAllStats(final RoutingContext routingContext) {
+    public void getOverallStats(final RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
         response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
         response.end(Json.encodePrettily(queries.getStatsForAll()));
+    }
+
+    public void getAllStats(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        writeResponse(response, HttpResponseStatus.OK);
+        response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+
+        Map<String, Object> overallMap = new HashMap<>();
+        Stats overallStats = queries.getStatsForAll();
+        overallMap.put("stats", overallStats);
+
+        Map<String, Collection<DbBeer>> beersByCategory = db.getBeersByCategory();
+        for (Entry<String, Collection<DbBeer>> entry : beersByCategory.entrySet()) {
+            Map<String, Object> categoryMap = new HashMap<>();
+            categoryMap.put("stats", queries.getStatsForCategory(entry.getKey()).get());
+            List<DbBeer> beerList = new ArrayList<DbBeer>(entry.getValue());
+            beerList.sort((o1, o2) -> {
+                return o1.getName().compareTo(o2.getName());
+            });
+            for (DbBeer dbBeer : beerList) {
+                categoryMap.put(dbBeer.getName(), queries.getStatsForBeer(dbBeer.getName()).get());
+            }
+            overallMap.put(entry.getKey(), categoryMap);
+        }
+
+        response.end(Json.encodePrettily(overallMap));
     }
 
     private void writeResponse(final HttpServerResponse response, final HttpResponseStatus status) {
