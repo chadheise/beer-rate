@@ -72,5 +72,8 @@ public class Server extends AbstractVerticle {
 
         router.post("/forms/ratings")
                 .handler(apiHandlers::postRatingFromForm);
+
+        router.get("/stats")
+                .handler(apiHandlers::getAllStats);
     }
 }

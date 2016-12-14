@@ -3,9 +3,11 @@ package com.manorllc.beerRate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
+import com.manorllc.beerRate.db.DbRating;
 import com.manorllc.beerRate.model.Stats;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -73,8 +75,19 @@ public class ApiHandlers {
     public void getAllRatings(final RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
+        Collection<DbRating> ratings = new HashSet<>();
+        db.getBeersByCategory().values()
+                .stream()
+                .flatMap(x -> x.stream())
+                .collect(Collectors.toList())
+                .forEach(beer -> {
+                    ratings.addAll(db.getRatingsForBeer(beer.getName()).values()
+                            .stream()
+                            .collect(Collectors.toList()));
+                });
+
         response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
-        response.end(Json.encodePrettily(queries.getStatsForAll()));
+        response.end(Json.encodePrettily(ratings));
     }
 
     public void putRating(final RoutingContext routingContext) {
@@ -131,6 +144,13 @@ public class ApiHandlers {
             }
         });
 
+    }
+
+    public void getAllStats(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        writeResponse(response, HttpResponseStatus.OK);
+        response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+        response.end(Json.encodePrettily(queries.getStatsForAll()));
     }
 
     private void writeResponse(final HttpServerResponse response, final HttpResponseStatus status) {
