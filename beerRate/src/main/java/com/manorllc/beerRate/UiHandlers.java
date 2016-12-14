@@ -72,4 +72,24 @@ public class UiHandlers {
         });
     }
 
+    public void summary(final RoutingContext ctx) {
+        templateEngine.render(ctx, "templates/summary.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+    }
+
+    public void summaryBody(final RoutingContext ctx) {
+        templateEngine.render(ctx, "templates/summaryBody.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+    }
+
 }
