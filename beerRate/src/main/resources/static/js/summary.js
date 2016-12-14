@@ -7,12 +7,14 @@ $(document).ready(function() {
 	    	
 	    	success: function(result){
 	    		$("body").html(result);
-//	    		document.open();
-//	    		document.write(result);
-//	    		document.close();
-		        //$("#div1").html(result);
+	    	    reloadStyle();
 	    	}
 	    });
+	}
+	
+	function reloadStyle(){
+		var stylesheet = $('#summaryStyle').attr('href');
+		$('#summaryStyle').attr('href',stylesheet);
 	}
 	
 	setInterval ( function() {
