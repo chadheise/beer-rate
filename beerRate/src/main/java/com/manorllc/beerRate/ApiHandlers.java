@@ -51,15 +51,13 @@ public class ApiHandlers {
         String category = ctx.request().getParam(HttpConstants.PARAM_CATEGORY);
         if (!db.categoryExists(category)) {
             writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-            response.write(String.format("Category %s does not exist", category));
-            response.end();
+            response.end(String.format("Category %s does not exist", category));
         } else {
             DbBeer newBeer = Json.decodeValue(ctx.getBodyAsJson().toString(), DbBeer.class);
 
             if (db.beerExists(newBeer.getName())) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-                response.write(String.format("Beer %s already exist", newBeer.getName()));
-                response.end();
+                response.end(String.format("Beer %s already exist", newBeer.getName()));
             } else {
                 db.addBeer(category, newBeer);
                 writeResponse(response, HttpResponseStatus.CREATED);
@@ -95,8 +93,7 @@ public class ApiHandlers {
         DbUser user = Json.decodeValue(ctx.getBodyAsJson().toString(), DbUser.class);
         if (db.userExists(user.getFirstName(), user.getLastName())) {
             writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-            response.write(String.format("User %s %s already exist", user.getFirstName(), user.getLastName()));
-            response.end();
+            response.end(String.format("User %s %s already exist", user.getFirstName(), user.getLastName()));
         } else {
             db.addUser(user);
             writeResponse(response, HttpResponseStatus.CREATED);
@@ -119,8 +116,7 @@ public class ApiHandlers {
 
             if (db.teamExists(teamName)) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-                response.write(String.format("Team %s already exist", teamName));
-                response.end();
+                response.end(String.format("Team %s already exist", teamName));
             } else {
                 db.addTeam(teamName);
                 writeResponse(response, HttpResponseStatus.CREATED);
@@ -133,27 +129,36 @@ public class ApiHandlers {
     }
 
     public void addUserToTeam(final RoutingContext ctx) {
-
         HttpServerResponse response = ctx.response();
-        String teamName = ctx.request().getParam(HttpConstants.PARAM_TEAM);
 
-        if (!db.teamExists(teamName)) {
-            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-            response.write(String.format("Team %s does not exist", teamName));
-            response.end();
-        } else {
-            String firstName = ctx.request().getParam(HttpConstants.PARAM_FIRST_NAME);
-            String lastName = ctx.request().getParam(HttpConstants.PARAM_LAST_NAME);
-            if (!db.userExists(firstName, lastName)) {
+        try {
+            String teamName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_TEAM),
+                    HttpConstants.ENCODING);
+
+            if (!db.teamExists(teamName)) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-                response.write(String.format("User %s %s does not exist", firstName, lastName));
-                response.end();
+                response.end(String.format("Team %s does not exist", teamName));
             } else {
-                db.removeUserFromTeam(firstName, lastName);
-                db.addUserToTeam(teamName, firstName, lastName);
-                writeResponse(response, HttpResponseStatus.CREATED);
-                response.end();
+                String firstName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_FIRST_NAME),
+                        HttpConstants.ENCODING);
+                String lastName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_LAST_NAME),
+                        HttpConstants.ENCODING);
+
+                if (!db.userExists(firstName, lastName)) {
+                    writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                    response.end(String.format("User %s %s does not exist", firstName, lastName));
+                } else {
+                    if (db.getTeamForUser(firstName, lastName).isPresent()) {
+                        db.removeUserFromTeam(firstName, lastName);
+                    }
+                    db.addUserToTeam(teamName, firstName, lastName);
+                    writeResponse(response, HttpResponseStatus.CREATED);
+                    response.end();
+                }
             }
+        } catch (UnsupportedEncodingException e) {
+            writeResponse(response, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            response.end();
         }
 
     }

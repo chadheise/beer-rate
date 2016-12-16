@@ -2,22 +2,30 @@ package com.manorllc.beerRate.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Generation;
 
+import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public class Parsers {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Parsers.class);
 
     /**
      * Parses a csv file and returns a collection of DbUser objects.
@@ -55,7 +63,8 @@ public class Parsers {
      * @param db
      * @throws IOException
      */
-    public static void parseTeamMembership(final String filePath, final Database db) throws IOException {
+    public static void parseTeamMembership(final String filePath, final HttpClient client, int port, String host)
+            throws IOException {
         Path path = Paths.get(new File(filePath).toURI());
         byte[] bytes = Files.readAllBytes(path);
         String string = new String(bytes);
@@ -64,10 +73,28 @@ public class Parsers {
             String teamName = entry.getKey();
             JsonArray users = json.getJsonArray(teamName);
             users.forEach(obj -> {
-                String userName = obj.toString();
-                String firstName = userName.split(" ")[0];
-                String lastName = userName.split(" ")[1];
-                db.addUserToTeam(teamName, firstName, lastName);
+                try {
+                    String userName = obj.toString();
+
+                    String firstName = userName.split(" ")[0];
+                    String lastName = userName.split(" ")[1];
+
+                    String uri = new StringBuilder("/teams/addUser/")
+                            .append(URLEncoder.encode(teamName, "UTF-8"))
+                            .append("?")
+                            .append("firstName=" + URLEncoder.encode(firstName, "UTF-8"))
+                            .append("&")
+                            .append("lastName=" + URLEncoder.encode(lastName, "UTF-8"))
+                            .toString();
+                    client.put(port, host, uri)
+                            .putHeader("Content-Length", Integer.toString(0))
+                            .handler(resp -> {
+                                LOGGER.debug(Integer.toString(resp.statusCode()));
+                            })
+                            .end();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             });
         });
     }

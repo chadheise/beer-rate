@@ -59,12 +59,12 @@ public class DatabaseInitializer {
             }
         });
 
-        // LOGGER.info("Initializing database with team membership");
-        // Parsers.parseTeamMembership(filePath + ROOT_DIR +
-        // "teamMembership.json", db);
-        //
-        // LOGGER.info("Initializing database with beers");
-        // Parsers.parseBeers(filePath + ROOT_DIR + "beers.json", db);
+        LOGGER.info("Initializing database with team membership");
+        Parsers.parseTeamMembership(filePath + ROOT_DIR +
+                "teamMembership.json", client, PORT, HOST);
+
+        LOGGER.info("Initializing database with beers");
+        // Parsers.parseBeers(filePath + ROOT_DIR + "beers.json", client);
 
         client.close();
 
