@@ -74,7 +74,7 @@ public class Server extends AbstractVerticle {
         router.get("/teams")
                 .handler(apiHandlers::getTeams);
 
-        router.put("/teams")
+        router.put("/teams/:" + HttpConstants.PARAM_TEAM)
                 .handler(apiHandlers::putTeam);
 
         router.put("/teams/addUser/:" + HttpConstants.PARAM_TEAM)

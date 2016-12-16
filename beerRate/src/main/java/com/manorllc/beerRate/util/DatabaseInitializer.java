@@ -1,7 +1,9 @@
 package com.manorllc.beerRate.util;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.file.Paths;
 
 import io.vertx.core.Vertx;
@@ -44,6 +46,17 @@ public class DatabaseInitializer {
 
         LOGGER.info("Initializing database with team data");
         Parsers.parseTeams(filePath + ROOT_DIR + "teams.csv").forEach(team -> {
+            try {
+                String encodedTeam = URLEncoder.encode(team, "UTF-8");
+                client.put(PORT, HOST, "/teams/" + encodedTeam)
+                        .putHeader("Content-Length", Integer.toString(0))
+                        .handler(resp -> {
+                            LOGGER.debug(resp.statusCode());
+                        })
+                        .end();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         });
 
         // LOGGER.info("Initializing database with team membership");

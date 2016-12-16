@@ -14,4 +14,6 @@ public final class HttpConstants {
     public static final String PARAM_FIRST_NAME = "firstName";
     public static final String PARAM_LAST_NAME = "lastName";
 
+    public static final String ENCODING = "UTF-8";
+
 }

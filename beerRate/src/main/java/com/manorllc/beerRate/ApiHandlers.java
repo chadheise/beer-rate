@@ -1,5 +1,7 @@
 package com.manorllc.beerRate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -111,15 +113,21 @@ public class ApiHandlers {
 
     public void putTeam(final RoutingContext ctx) {
         HttpServerResponse response = ctx.response();
-        String teamName = ctx.request().getParam(HttpConstants.PARAM_TEAM);
+        try {
+            String teamName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_TEAM),
+                    HttpConstants.ENCODING);
 
-        if (db.teamExists(teamName)) {
-            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-            response.write(String.format("Team %s already exist", teamName));
-            response.end();
-        } else {
-            db.addTeam(teamName);
-            writeResponse(response, HttpResponseStatus.CREATED);
+            if (db.teamExists(teamName)) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.write(String.format("Team %s already exist", teamName));
+                response.end();
+            } else {
+                db.addTeam(teamName);
+                writeResponse(response, HttpResponseStatus.CREATED);
+                response.end();
+            }
+        } catch (UnsupportedEncodingException e) {
+            writeResponse(response, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             response.end();
         }
     }
