@@ -62,8 +62,23 @@ public class Server extends AbstractVerticle {
         router.get("/beers")
                 .handler(apiHandlers::getAllBeers);
 
+        router.put("/beers/:" + HttpConstants.PARAM_CATEGORY)
+                .handler(apiHandlers::putBeer);
+
         router.get("/users")
                 .handler(apiHandlers::getAllUsers);
+
+        router.put("/users")
+                .handler(apiHandlers::putUser);
+
+        router.get("/teams")
+                .handler(apiHandlers::getTeams);
+
+        router.put("/teams")
+                .handler(apiHandlers::putTeam);
+
+        router.put("/teams/addUser/:" + HttpConstants.PARAM_TEAM)
+                .handler(apiHandlers::addUserToTeam);
 
         router.get("/ratings")
                 .handler(apiHandlers::getAllRatings);

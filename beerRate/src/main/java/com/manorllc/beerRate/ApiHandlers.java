@@ -14,6 +14,7 @@ import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
 import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbRating;
+import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Stats;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -42,6 +43,29 @@ public class ApiHandlers {
         response.end(Json.encodePrettily(db.getBeersByCategory()));
     }
 
+    public void putBeer(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+
+        String category = ctx.request().getParam(HttpConstants.PARAM_CATEGORY);
+        if (!db.categoryExists(category)) {
+            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+            response.write(String.format("Category %s does not exist", category));
+            response.end();
+        } else {
+            DbBeer newBeer = Json.decodeValue(ctx.getBodyAsJson().toString(), DbBeer.class);
+
+            if (db.beerExists(newBeer.getName())) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.write(String.format("Beer %s already exist", newBeer.getName()));
+                response.end();
+            } else {
+                db.addBeer(category, newBeer);
+                writeResponse(response, HttpResponseStatus.CREATED);
+                response.end();
+            }
+        }
+    }
+
     public void getAllUsers(final RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
@@ -59,6 +83,70 @@ public class ApiHandlers {
         });
         response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
         response.end(Json.encodePrettily(userCollection));
+    }
+
+    public void putUser(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+
+        DbUser user = Json.decodeValue(ctx.getBodyAsJson().toString(), DbUser.class);
+
+        if (db.userExists(user.getFirstName(), user.getLastName())) {
+            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+            response.write(String.format("User %s %s already exist", user.getFirstName(), user.getLastName()));
+            response.end();
+        } else {
+            db.addUser(user);
+            writeResponse(response, HttpResponseStatus.CREATED);
+            response.end();
+        }
+    }
+
+    public void getTeams(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        writeResponse(response, HttpResponseStatus.OK);
+        response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+        response.end(Json.encodePrettily(db.getUsersByTeam()));
+    }
+
+    public void putTeam(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+        String teamName = ctx.request().getParam(HttpConstants.PARAM_TEAM);
+
+        if (db.teamExists(teamName)) {
+            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+            response.write(String.format("Team %s already exist", teamName));
+            response.end();
+        } else {
+            db.addTeam(teamName);
+            writeResponse(response, HttpResponseStatus.CREATED);
+            response.end();
+        }
+    }
+
+    public void addUserToTeam(final RoutingContext ctx) {
+
+        HttpServerResponse response = ctx.response();
+        String teamName = ctx.request().getParam(HttpConstants.PARAM_TEAM);
+
+        if (!db.teamExists(teamName)) {
+            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+            response.write(String.format("Team %s does not exist", teamName));
+            response.end();
+        } else {
+            String firstName = ctx.request().getParam(HttpConstants.PARAM_FIRST_NAME);
+            String lastName = ctx.request().getParam(HttpConstants.PARAM_LAST_NAME);
+            if (!db.userExists(firstName, lastName)) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.write(String.format("User %s %s does not exist", firstName, lastName));
+                response.end();
+            } else {
+                db.removeUserFromTeam(firstName, lastName);
+                db.addUserToTeam(teamName, firstName, lastName);
+                writeResponse(response, HttpResponseStatus.CREATED);
+                response.end();
+            }
+        }
+
     }
 
     public void getRatings(final RoutingContext routingContext) {

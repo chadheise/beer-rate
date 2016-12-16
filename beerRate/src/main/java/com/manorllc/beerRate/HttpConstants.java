@@ -7,8 +7,10 @@ public final class HttpConstants {
     public static final String HEADER_VALUE_JSON = "application/json";
     public static final String HEADER_VALUE_TEXT = "text/plain";
 
+    public static final String PARAM_CATEGORY = "category";
     public static final String PARAM_BEER = "beer";
     public static final String PARAM_RATING = "rating";
+    public static final String PARAM_TEAM = "team";
     public static final String PARAM_FIRST_NAME = "firstName";
     public static final String PARAM_LAST_NAME = "lastName";
 
