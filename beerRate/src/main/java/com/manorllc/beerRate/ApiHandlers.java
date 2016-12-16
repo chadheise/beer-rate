@@ -38,6 +38,26 @@ public class ApiHandlers {
         this.queries = queries;
     }
 
+    public void putCategory(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+        try {
+            String categoryName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_CATEGORY),
+                    HttpConstants.ENCODING);
+
+            if (db.teamExists(categoryName)) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.end(String.format("Category %s already exist", categoryName));
+            } else {
+                db.addCategory(categoryName);
+                writeResponse(response, HttpResponseStatus.CREATED);
+                response.end();
+            }
+        } catch (UnsupportedEncodingException e) {
+            writeResponse(response, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            response.end();
+        }
+    }
+
     public void getAllBeers(final RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
@@ -48,21 +68,27 @@ public class ApiHandlers {
     public void putBeer(final RoutingContext ctx) {
         HttpServerResponse response = ctx.response();
 
-        String category = ctx.request().getParam(HttpConstants.PARAM_CATEGORY);
-        if (!db.categoryExists(category)) {
-            writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-            response.end(String.format("Category %s does not exist", category));
-        } else {
-            DbBeer newBeer = Json.decodeValue(ctx.getBodyAsJson().toString(), DbBeer.class);
-
-            if (db.beerExists(newBeer.getName())) {
+        try {
+            String category = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_CATEGORY),
+                    HttpConstants.ENCODING);
+            if (!db.categoryExists(category)) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
-                response.end(String.format("Beer %s already exist", newBeer.getName()));
+                response.end(String.format("Category %s does not exist", category));
             } else {
-                db.addBeer(category, newBeer);
-                writeResponse(response, HttpResponseStatus.CREATED);
-                response.end();
+                DbBeer newBeer = Json.decodeValue(ctx.getBodyAsJson().toString(), DbBeer.class);
+
+                if (db.beerExists(newBeer.getName())) {
+                    writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                    response.end(String.format("Beer %s already exist", newBeer.getName()));
+                } else {
+                    db.addBeer(category, newBeer);
+                    writeResponse(response, HttpResponseStatus.CREATED);
+                    response.end();
+                }
             }
+        } catch (UnsupportedEncodingException e) {
+            writeResponse(response, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            response.end();
         }
     }
 

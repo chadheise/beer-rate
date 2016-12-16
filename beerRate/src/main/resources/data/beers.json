@@ -1,16 +1,26 @@
 {
 	"Lagers & Pilsners": [
 		{
+			"name": "Michelob",
+			"brewery": "Anheuser Busch",
+			"style": "American Lager"
+		},
+		{
+			"name": "Capital Winter Skal",
+			"brewery": "Capital Brewing",
+			"style": "Amber Lager"
+		},
+		{
 			"name": "Pilsner Urquel",
 			"brewery": "Pilsner Urquell Brewery",
 			"style": "European Pilsner"
 		}
 	],
-	"Belgian": [
+	"Belgian Ales": [
 		{
 			"name": "Duvel",
 			"brewery": "Brouwerij Duvel Moortgat NV",
-			"style": "Strong ale"
+			"style": "Belgian Strong Ale"
 		},
 		{
 			"name": "Chimay Premiere (Red)",
@@ -28,14 +38,45 @@
 			"style": "Quad"
 		}
 	],
-	"Sours, Fruits, & Flavors": [
+	"Sours & Fruits": [
+		{
+			"name": "Kriek",
+			"brewery": "Lindemans",
+			"style": "Lambic Fruit"
+		},
+		{
+			"name": "Peche",
+			"brewery": "Lindemans",
+			"style": "Lambic Fruit"
+		},
+		{
+			"name": "Monks Cafe Flemish Sour Ale",
+			"brewery": "Van Steenberge Brewery",
+			"style": "Sour Ale"
+		},
+		{
+			"name": "Woodchuck Anmber Hard Cider",
+			"brewery": "Woodchuck Cidery",
+			"style": "Cider"
+		}
 	],
-	"Wheat": [
+	"Wheat Beers": [
+		{
+			"name": "Lagunitas Little Sumpin Sumpin Ale",
+			"brewery": "Lagunitas Brewing Co",
+			"style": "Pale Wheat Ale"
+		},
+		{
+			"name": "White",
+			"brewery": "Alaskan Brewing Co",
+			"style": "Belgian Wheat"
+		},
 		{
 			"name": "Heiseweisen",
-			"brewery": "Heise Brewing Co.",
-			"style": "Homebrew"
+			"brewery": "Home Brewed",
+			"style": "German Hefeweizen"
 		}
+		
 	],
 	"Pale Ales": [
 		{
@@ -44,16 +85,36 @@
 			"style": "American Fresh Hop Pale Ale"
 		},
 		{
+			"name": "Very Bad Elf Ale",
+			"brewery": "Ridgeway Brewing",
+			"style": "Winter Ale"
+		},
+		{
 			"name": "Goose IPA",
 			"brewery": "Goose Island Beer Co.",
 			"style": "English IPA"
 		}
 	],
-	"Stouts, Porters & Dark Ales": [
+	"Stouts & Porters": [
 		{
 			"name": "Guinness Draught",
 			"brewery": "Guinness Ltd.",
 			"style": "Irish Stout"
+		},
+		{
+			"name": "Edmund Fitzgerald Porter",
+			"brewery": "Great Lakes Brewing Co.",
+			"style": "American Porter"
+		},
+		{
+			"name": "Brau Brothers Moo Joos Oatmeal Milk Stout",
+			"brewery": "Brau Brothers Brewing Co.",
+			"style": "Oatmeal/Milk Stout"
+		},
+		{
+			"name": "Christmas Bomb!",
+			"brewery": "Prairie Artisan Ales",
+			"style": "American Double Stout"
 		}
 	]
 }

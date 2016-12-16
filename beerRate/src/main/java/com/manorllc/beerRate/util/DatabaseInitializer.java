@@ -64,10 +64,9 @@ public class DatabaseInitializer {
                 "teamMembership.json", client, PORT, HOST);
 
         LOGGER.info("Initializing database with beers");
-        // Parsers.parseBeers(filePath + ROOT_DIR + "beers.json", client);
+        Parsers.parseBeers(filePath + ROOT_DIR + "beers.json", client, PORT, HOST);
 
         client.close();
-
     }
 
 }

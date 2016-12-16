@@ -59,6 +59,9 @@ public class Server extends AbstractVerticle {
         router.get("/ui/summary/body")
                 .handler(uiHandlers::summaryBody);
 
+        router.put("/categories/:" + HttpConstants.PARAM_CATEGORY)
+                .handler(apiHandlers::putCategory);
+
         router.get("/beers")
                 .handler(apiHandlers::getAllBeers);
 

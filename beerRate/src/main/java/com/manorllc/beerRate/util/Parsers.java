@@ -13,13 +13,10 @@ import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.manorllc.beerRate.db.Database;
-import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Generation;
 
 import io.vertx.core.http.HttpClient;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -63,7 +60,8 @@ public class Parsers {
      * @param db
      * @throws IOException
      */
-    public static void parseTeamMembership(final String filePath, final HttpClient client, int port, String host)
+    public static void parseTeamMembership(final String filePath, final HttpClient client, final int port,
+            final String host)
             throws IOException {
         Path path = Paths.get(new File(filePath).toURI());
         byte[] bytes = Files.readAllBytes(path);
@@ -99,21 +97,40 @@ public class Parsers {
         });
     }
 
-    public static void parseBeers(final String filePath, final Database db) throws IOException {
+    public static void parseBeers(final String filePath, final HttpClient client, final int port, final String host)
+            throws IOException {
         Path path = Paths.get(new File(filePath).toURI());
         byte[] bytes = Files.readAllBytes(path);
         String string = new String(bytes);
         JsonObject json = new JsonObject(string);
         json.stream().forEach(entry -> {
             String categoryName = entry.getKey();
-            if (!db.categoryExists(categoryName)) {
-                db.addCategory(categoryName);
+
+            try {
+                String uri = "/categories/" + URLEncoder.encode(categoryName, "UTF-8");
+                client.put(port, host, uri)
+                        .putHeader("Content-Length", Integer.toString(0))
+                        .handler(resp -> {
+                            LOGGER.debug(Integer.toString(resp.statusCode()));
+                        })
+                        .end();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
 
             JsonArray beers = json.getJsonArray(categoryName);
             beers.forEach(obj -> {
-                DbBeer dbBeer = Json.decodeValue(obj.toString(), DbBeer.class);
-                db.addBeer(categoryName, dbBeer);
+                try {
+                    String uri = "/beers/" + URLEncoder.encode(categoryName, "UTF-8");
+                    client.put(port, host, uri)
+                            .handler(resp -> {
+                                LOGGER.debug(Integer.toString(resp.statusCode()));
+                            })
+                            .end(obj.toString());
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
             });
         });
     }
