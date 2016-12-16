@@ -21,6 +21,6 @@ $(document).ready(function() {
 	
 	setInterval ( function() {
 		refresh();
-	}, 50000 );
+	}, 5000 );
 	
 });
