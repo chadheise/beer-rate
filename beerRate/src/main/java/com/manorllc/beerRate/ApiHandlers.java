@@ -70,16 +70,18 @@ public class ApiHandlers {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
         Collection<JsonObject> userCollection = new HashSet<>();
-        db.getUsersByTeam().entrySet().forEach(entry -> {
-            entry.getValue().forEach(u -> {
-                JsonObject j = new JsonObject();
-                j.put("firstName", u.getFirstName());
-                j.put("lastName", u.getLastName());
-                j.put("generation", u.getGeneration());
-                j.put("team", entry.getKey());
-                userCollection.add(j);
-            });
-
+        db.getUsers().forEach(u -> {
+            JsonObject j = new JsonObject();
+            j.put("firstName", u.getFirstName());
+            j.put("lastName", u.getLastName());
+            j.put("generation", u.getGeneration());
+            Optional<String> teamOpt = db.getTeamForUser(u.getFirstName(), u.getLastName());
+            if (teamOpt.isPresent()) {
+                j.put("team", teamOpt.get());
+            } else {
+                j.put("team", "None");
+            }
+            userCollection.add(j);
         });
         response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
         response.end(Json.encodePrettily(userCollection));
@@ -89,7 +91,6 @@ public class ApiHandlers {
         HttpServerResponse response = ctx.response();
 
         DbUser user = Json.decodeValue(ctx.getBodyAsJson().toString(), DbUser.class);
-
         if (db.userExists(user.getFirstName(), user.getLastName())) {
             writeResponse(response, HttpResponseStatus.BAD_REQUEST);
             response.write(String.format("User %s %s already exist", user.getFirstName(), user.getLastName()));

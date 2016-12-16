@@ -213,6 +213,10 @@ public class Database {
         });
     }
 
+    public Collection<DbUser> getUsers() {
+        return users.values();
+    }
+
     public Optional<String> getTeamForUser(final String firstName, final String lastName) {
         Optional<UUID> userIdOpt = getUserId(firstName, lastName);
         if (!userIdOpt.isPresent()) {
