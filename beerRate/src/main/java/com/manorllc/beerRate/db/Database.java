@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.joda.time.DateTime;
 
@@ -20,11 +22,11 @@ import org.joda.time.DateTime;
 public class Database {
 
     // Model objects
-    private Map<UUID, DbCategory> categories = new HashMap<>();
-    private Map<UUID, DbBeer> beers = new HashMap<>();
-    private Map<UUID, DbTeam> teams = new HashMap<>();
-    private Map<UUID, DbUser> users = new HashMap<>();
-    private Map<UUID, DbRating> ratings = new HashMap<>();
+    private ConcurrentMap<UUID, DbCategory> categories = new ConcurrentHashMap<>();
+    private ConcurrentMap<UUID, DbBeer> beers = new ConcurrentHashMap<>();
+    private ConcurrentMap<UUID, DbTeam> teams = new ConcurrentHashMap<>();
+    private ConcurrentMap<UUID, DbUser> users = new ConcurrentHashMap<>();
+    private ConcurrentMap<UUID, DbRating> ratings = new ConcurrentHashMap<>();
 
     // Model relationships
 
@@ -214,11 +216,7 @@ public class Database {
         UUID teamId = getTeamId(teamOpt.get()).get();
         UUID thisUserId = getUserId(firstName, lastName).get();
 
-        usersByTeam.get(teamId).forEach(userId -> {
-            if (userId.equals(thisUserId)) {
-                usersByTeam.get(teamId).remove(thisUserId);
-            }
-        });
+        usersByTeam.get(teamId).remove(thisUserId);
     }
 
     public Collection<DbUser> getUsers() {
