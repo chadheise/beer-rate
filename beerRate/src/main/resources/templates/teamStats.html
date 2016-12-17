@@ -22,6 +22,14 @@
 <body>
 	<div class="container">
 		<h1 class="block" th:text="|Team stats: ${team.name}|">Team name not found</h1>
+		
+		<div>
+		  <h2>Team members:</h2>
+		  <ul>
+		      <li th:each="user : ${users}" th:text="|${user.firstName} ${user.lastName}|">User</li>
+		  </ul>
+		</div>
+		
 		<div>
 			<a class="button" href="/ui/host">Back to host page</a>
 		</div>

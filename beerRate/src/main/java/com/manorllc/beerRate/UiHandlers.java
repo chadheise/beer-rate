@@ -154,7 +154,11 @@ public class UiHandlers {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
                 response.end(String.format("Team %s does not exist", teamName));
             } else {
-                ctx.put("team", teamOpt.get());
+                DbTeam team = teamOpt.get();
+                ctx.put("team", team);
+
+                List<DbUser> users = sortUsers(db.getUsersForTeam(team.getName()));
+                ctx.put("users", users);
 
                 // TODO: Get the desired stats for the team
 
