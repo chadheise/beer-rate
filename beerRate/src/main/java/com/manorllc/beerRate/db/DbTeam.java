@@ -8,6 +8,9 @@ public class DbTeam {
         this.name = name;
     }
 
+    public DbTeam() {
+    }
+
     public String getName() {
         return name;
     }

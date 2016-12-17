@@ -62,6 +62,12 @@ public class Server extends AbstractVerticle {
         router.get("/ui/summary/body")
                 .handler(uiHandlers::summaryBody);
 
+        router.get("/ui/host")
+                .handler(uiHandlers::host);
+
+        router.get("/ui/hostFormSuccess")
+                .handler(uiHandlers::hostFormSuccess);
+
         router.put("/categories/:" + HttpConstants.PARAM_CATEGORY)
                 .handler(apiHandlers::putCategory);
 
@@ -99,6 +105,15 @@ public class Server extends AbstractVerticle {
 
         router.post("/forms/ratings")
                 .handler(apiHandlers::postRatingFromForm);
+
+        router.post("/forms/addUser")
+                .handler(apiHandlers::addUserFromForm);
+
+        router.post("/forms/addTeam")
+                .handler(apiHandlers::addTeamFromForm);
+
+        router.post("/forms/changeTeam")
+                .handler(apiHandlers::changeTeamFromForm);
 
         router.get("/stats")
                 .handler(apiHandlers::getAllStats);

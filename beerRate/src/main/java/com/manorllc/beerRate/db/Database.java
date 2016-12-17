@@ -266,6 +266,10 @@ public class Database {
         return userCollection;
     }
 
+    public Collection<DbTeam> getTeams() {
+        return teams.values();
+    }
+
     public void addRating(final String firstName, final String lastName, final String beerName,
             final double ratingValue) {
         Optional<UUID> userIdOpt = getUserId(firstName, lastName);

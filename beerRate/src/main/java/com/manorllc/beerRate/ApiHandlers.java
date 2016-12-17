@@ -17,6 +17,7 @@ import com.manorllc.beerRate.db.DatabaseQueries;
 import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbRating;
 import com.manorllc.beerRate.db.DbUser;
+import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Stats;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -277,7 +278,68 @@ public class ApiHandlers {
                 routingContext.response().end();
             }
         });
+    }
 
+    public void addTeamFromForm(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        routingContext.request().setExpectMultipart(true);
+        routingContext.request().endHandler(v -> {
+            String teamName = routingContext.request().formAttributes().get("teamName");
+
+            if (db.teamExists(teamName)) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
+                response.end(String.format("Team \"%s\" already exists", teamName));
+            } else {
+                db.addTeam(teamName);
+                writeResponse(response, HttpResponseStatus.FOUND);
+                response.putHeader("Location", "/ui/hostFormSuccess");
+                response.end();
+            }
+        });
+    }
+
+    public void addUserFromForm(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        routingContext.request().setExpectMultipart(true);
+        routingContext.request().endHandler(v -> {
+            String firstName = routingContext.request().formAttributes().get("firstName");
+            String lastName = routingContext.request().formAttributes().get("lastName");
+            String generationString = routingContext.request().formAttributes().get("generation");
+            Generation gen = Generation.valueOf(generationString);
+
+            if (db.userExists(firstName, lastName)) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_TEXT);
+                response.end(String.format("USer %s %s already exists", firstName, lastName));
+            } else {
+                db.addUser(new DbUser(firstName, lastName, gen));
+                writeResponse(response, HttpResponseStatus.FOUND);
+                response.putHeader("Location", "/ui/hostFormSuccess");
+                response.end();
+            }
+        });
+    }
+
+    public void changeTeamFromForm(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        routingContext.request().setExpectMultipart(true);
+        routingContext.request().endHandler(v -> {
+            String userName = routingContext.request().formAttributes().get("user");
+            String firstName = userName.split(",")[1].trim();
+            String lastName = userName.split(",")[0].trim();
+            String teamName = routingContext.request().formAttributes().get("team");
+
+            if (db.getTeamForUser(firstName, lastName).isPresent()) {
+                db.removeUserFromTeam(firstName, lastName);
+            }
+            db.addUserToTeam(teamName, firstName, lastName);
+            writeResponse(response, HttpResponseStatus.FOUND);
+            response.putHeader("Location", "/ui/hostFormSuccess");
+            response.end();
+        });
     }
 
     public void getOverallStats(final RoutingContext routingContext) {

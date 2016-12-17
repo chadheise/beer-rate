@@ -1,0 +1,65 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>So-So Beery Christmas</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="../static/css/jquery.mobile-1.4.5.min.css"
+	th:href="@{~/static/css/jquery.mobile-1.4.5.min.css}" />
+<script src="../static/js/jquery-1.11.3.min.js" th:src="@{~/static/js/jquery-1.11.3.min.js}"></script>
+<script src="../static/js/jquery.mobile-1.4.5.min.js" th:src="@{~/static/js/jquery.mobile-1.4.5.min.js}"></script>
+
+<link rel="stylesheet" href="../static/css/themes/Christmas.css" th:href="@{~/static/css/themes/Christmas.css}" />
+<link rel="stylesheet" href="../static/css/themes/jquery.mobile.icons.min.css"
+	th:href="@{~/static/css/themes/jquery.mobile.icons.min.css}" />
+<script type="text/javascript" th:inline="javascript" th:src="@{~/static/js/host.js}"></script>
+
+<link rel="stylesheet" href="../static/css/main.css" th:href="@{~/static/css/main.css}" type="text/css" />
+
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="block">Beery Christmas Host</h1>
+
+        <p id="addUserButton" class="button">Add User</p>
+        <form id="addUserForm" class="form" method="post" action="/forms/addUser">
+            <span>First Name:</span><input name="firstName" type="text" />
+            <span>Last Name:</span><input name="lastName" type="text"></input>
+            <select name="generation">
+                <span>Generation:</span>
+                <option th:each="gen : ${generations}" th:text="${gen}">Generation</option>
+            </select>
+            <input type="submit" data-inline="true"
+                value="Submit" class="ui-btn">
+        </form>
+
+		<p id="addTeamButton" class="button">Add Team</p>
+		<form id="addTeamForm" class="form" method="post" action="/forms/addTeam">
+			<span>Team Name:</span><input name="teamName" type="text"></input> <input type="submit" data-inline="true"
+				value="Submit" class="ui-btn">
+		</form>
+
+		<p id="changeTeamButton" class="button">Change Team</p>
+		<form id="changeTeamForm" class="form" method="post" action="/forms/changeTeam">
+			<select name="user">
+				<span>User:</span>
+				<option th:each="user : ${users}" th:text="|${user.lastName}, ${user.firstName}|">User</option>
+			</select> <select name="team">
+				<span>Team:</span>
+				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
+			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
+		</form>
+
+		<p id="teamStatsButton" class="button">Team Stats</p>
+		<form id="teamStatsForm" class="form" method="post" action="/forms/ratings">
+			<select name="team">
+				<span>Team:</span>
+				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
+			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
+		</form>
+	</div>
+</body>
+
+</html>

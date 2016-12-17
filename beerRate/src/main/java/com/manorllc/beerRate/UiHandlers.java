@@ -11,6 +11,7 @@ import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
 import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbUser;
+import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Stats;
 
 import io.vertx.ext.web.RoutingContext;
@@ -103,6 +104,30 @@ public class UiHandlers {
         ctx.put("beerStats", beerStats);
 
         templateEngine.render(ctx, "templates/summaryBody.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+    }
+
+    public void host(final RoutingContext ctx) {
+        ctx.put("users", db.getUsers());
+        ctx.put("teams", db.getTeams());
+        ctx.put("generations", Generation.values());
+
+        templateEngine.render(ctx, "templates/host.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+    }
+
+    public void hostFormSuccess(final RoutingContext ctx) {
+        templateEngine.render(ctx, "templates/hostFormSuccess.html", res -> {
             if (res.succeeded()) {
                 ctx.response().end(res.result());
             } else {
