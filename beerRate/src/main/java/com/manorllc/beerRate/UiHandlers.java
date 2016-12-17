@@ -39,10 +39,10 @@ public class UiHandlers {
         // Add beer directly for easier access in template
         routingContext.put("beer", beerName);
 
-        List<DbUser> users = db.getUsersByTeam().values()
+        List<DbUser> users = sortUsers(db.getUsersByTeam().values()
                 .stream()
                 .flatMap(teamCollection -> teamCollection.stream())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
         users.sort((u1, u2) -> {
             String full1 = u1.getLastName() + u1.getFirstName();
             String full2 = u2.getLastName() + u2.getFirstName();
@@ -118,8 +118,9 @@ public class UiHandlers {
     }
 
     public void host(final RoutingContext ctx) {
-        ctx.put("users", db.getUsers());
-        ctx.put("teams", db.getTeams());
+
+        ctx.put("users", sortUsers(db.getUsers()));
+        ctx.put("teams", sortTeams(db.getTeams()));
         ctx.put("generations", Generation.values());
 
         templateEngine.render(ctx, "templates/host.html", res -> {
@@ -176,6 +177,28 @@ public class UiHandlers {
     private void writeResponse(final HttpServerResponse response, final HttpResponseStatus status) {
         response.setStatusCode(status.code());
         response.setStatusMessage(status.reasonPhrase());
+    }
+
+    private List<DbUser> sortUsers(final Collection<DbUser> userCollection) {
+        List<DbUser> users = userCollection
+                .stream()
+                .collect(Collectors.toList());
+        users.sort((u1, u2) -> {
+            String full1 = u1.getLastName() + u1.getFirstName();
+            String full2 = u2.getLastName() + u2.getFirstName();
+            return (full1.compareTo(full2));
+        });
+        return users;
+    }
+
+    private List<DbTeam> sortTeams(final Collection<DbTeam> teamCollection) {
+        List<DbTeam> teams = teamCollection
+                .stream()
+                .collect(Collectors.toList());
+        teams.sort((t1, t2) -> {
+            return (t1.getName().compareTo(t2.getName()));
+        });
+        return teams;
     }
 
 }
