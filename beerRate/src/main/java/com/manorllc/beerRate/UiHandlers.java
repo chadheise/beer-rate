@@ -1,5 +1,7 @@
 package com.manorllc.beerRate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +12,13 @@ import java.util.stream.Collectors;
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
 import com.manorllc.beerRate.db.DbBeer;
+import com.manorllc.beerRate.db.DbTeam;
 import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Stats;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.TemplateEngine;
 
@@ -134,6 +139,43 @@ public class UiHandlers {
                 ctx.fail(res.cause());
             }
         });
+    }
+
+    public void teamStats(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+
+        try {
+            String teamName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_TEAM),
+                    HttpConstants.ENCODING);
+
+            Optional<DbTeam> teamOpt = db.getTeam(teamName);
+            if (!teamOpt.isPresent()) {
+                writeResponse(response, HttpResponseStatus.BAD_REQUEST);
+                response.end(String.format("Team %s does not exist", teamName));
+            } else {
+                ctx.put("team", teamOpt.get());
+
+                // TODO: Get the desired stats for the team
+
+                templateEngine.render(ctx, "templates/teamStats.html", res -> {
+                    if (res.succeeded()) {
+                        ctx.response().end(res.result());
+                    } else {
+                        ctx.fail(res.cause());
+                    }
+                });
+
+            }
+        } catch (UnsupportedEncodingException e) {
+            writeResponse(response, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            response.end();
+        }
+
+    }
+
+    private void writeResponse(final HttpServerResponse response, final HttpResponseStatus status) {
+        response.setStatusCode(status.code());
+        response.setStatusMessage(status.reasonPhrase());
     }
 
 }

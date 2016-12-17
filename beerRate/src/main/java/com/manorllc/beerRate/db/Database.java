@@ -135,6 +135,14 @@ public class Database {
         return Optional.empty();
     }
 
+    public Optional<DbTeam> getTeam(final String teamName) {
+        Optional<UUID> teamIdOpt = getTeamId(teamName);
+        if (teamIdOpt.isPresent()) {
+            return Optional.of(teams.get(teamIdOpt.get()));
+        }
+        return Optional.empty();
+    }
+
     public void addTeam(final String teamName) {
         if (teamExists(teamName)) {
             throw new RuntimeException(String.format("Team %s already exists", teamName));

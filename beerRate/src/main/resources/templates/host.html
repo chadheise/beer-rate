@@ -23,17 +23,13 @@
 	<div class="container">
 		<h1 class="block">Beery Christmas Host</h1>
 
-        <p id="addUserButton" class="button">Add User</p>
-        <form id="addUserForm" class="form" method="post" action="/forms/addUser">
-            <span>First Name:</span><input name="firstName" type="text" />
-            <span>Last Name:</span><input name="lastName" type="text"></input>
-            <select name="generation">
-                <span>Generation:</span>
-                <option th:each="gen : ${generations}" th:text="${gen}">Generation</option>
-            </select>
-            <input type="submit" data-inline="true"
-                value="Submit" class="ui-btn">
-        </form>
+		<p id="addUserButton" class="button">Add User</p>
+		<form id="addUserForm" class="form" method="post" action="/forms/addUser">
+			<span>First Name:</span><input name="firstName" type="text" /> <span>Last Name:</span><input name="lastName"
+				type="text"></input> <span>Generation:</span> <select name="generation">
+				<option th:each="gen : ${generations}" th:text="${gen}">Generation</option>
+			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
+		</form>
 
 		<p id="addTeamButton" class="button">Add Team</p>
 		<form id="addTeamForm" class="form" method="post" action="/forms/addTeam">
@@ -43,19 +39,16 @@
 
 		<p id="changeTeamButton" class="button">Change Team</p>
 		<form id="changeTeamForm" class="form" method="post" action="/forms/changeTeam">
-			<select name="user">
-				<span>User:</span>
+			<span>User:</span> <select name="user">
 				<option th:each="user : ${users}" th:text="|${user.lastName}, ${user.firstName}|">User</option>
-			</select> <select name="team">
-				<span>Team:</span>
+			</select> <span>Team:</span> <select name="team">
 				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>
 
 		<p id="teamStatsButton" class="button">Team Stats</p>
-		<form id="teamStatsForm" class="form" method="post" action="/forms/ratings">
-			<select name="team">
-				<span>Team:</span>
+		<form id="teamStatsForm" class="form" method="post" action="/forms/teamStats">
+			<span>Team:</span> <select name="team">
 				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>

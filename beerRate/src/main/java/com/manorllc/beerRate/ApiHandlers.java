@@ -2,6 +2,7 @@ package com.manorllc.beerRate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -339,6 +340,24 @@ public class ApiHandlers {
             writeResponse(response, HttpResponseStatus.FOUND);
             response.putHeader("Location", "/ui/hostFormSuccess");
             response.end();
+        });
+    }
+
+    public void teamStatsFromForm(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        routingContext.request().setExpectMultipart(true);
+        routingContext.request().endHandler(v -> {
+            try {
+                String teamName = routingContext.request().formAttributes().get("team");
+                writeResponse(response, HttpResponseStatus.FOUND);
+                response.putHeader("Location",
+                        "/ui/host/teamStats/" + URLEncoder.encode(teamName, HttpConstants.ENCODING));
+                response.end();
+            } catch (UnsupportedEncodingException e) {
+                writeResponse(response, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                response.end();
+            }
+
         });
     }
 
