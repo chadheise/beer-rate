@@ -17,11 +17,12 @@ public class DatabaseInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseInitializer.class);
 
-     private static final String HOST = "localhost";
-     private static final int PORT = 8080;
+    private static final String HOST = "localhost";
+    private static final int PORT = 8080;
 
-//    private static final String HOST = "beerychristmas.us-west-2.elasticbeanstalk.com";
-//    private static final int PORT = 80;
+    // private static final String HOST =
+    // "beerychristmas.us-west-2.elasticbeanstalk.com";
+    // private static final int PORT = 80;
 
     private static final String ROOT_DIR = "/src/main/resources/data/";
     private static final Vertx VERTX = Vertx.factory.vertx();
@@ -63,9 +64,9 @@ public class DatabaseInitializer {
             }
         });
 
-        LOGGER.info("Initializing database with team membership");
-        Parsers.parseTeamMembership(filePath + ROOT_DIR +
-                "teamMembership.json", client, PORT, HOST);
+        // LOGGER.info("Initializing database with team membership");
+        // Parsers.parseTeamMembership(filePath + ROOT_DIR +
+        // "teamMembership.json", client, PORT, HOST);
 
         LOGGER.info("Initializing database with beers");
         Parsers.parseBeers(filePath + ROOT_DIR + "beers.json", client, PORT, HOST);

@@ -2,9 +2,12 @@ package com.manorllc.beerRate.db;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.SynchronizedSummaryStatistics;
 
@@ -56,6 +59,37 @@ public class DatabaseQueries {
         Stats stats = getStats(ratings);
         return stats;
 
+    }
+
+    /**
+     * Returns the first person to check in a beer from each category
+     * 
+     * @return
+     */
+    public Map<String, String> getTeamCaptains() {
+        Map<String, String> captains = new HashMap<>();
+        Set<String> captainSet = new HashSet<>();
+
+        Map<String, String> beerToCategory = db.getBeerToCategory();
+        db.getRatings().forEach(rating -> {
+            String categoryName = beerToCategory.get(rating.getBeerName());
+
+            if (!captains.containsKey(categoryName)) {
+                // Ignore members of the Heise family as they should not be
+                // captains
+                if (!rating.getUserLastName().equalsIgnoreCase("Heise")) {
+                    String fullName = rating.getUserFirstName() + " " + rating.getUserLastName();
+                    // Only add them as a captain if they are not captain of
+                    // another team
+                    if (!captainSet.contains(fullName)) {
+                        captains.put(categoryName, fullName);
+                        captainSet.add(fullName);
+                    }
+                }
+            }
+
+        });
+        return captains;
     }
 
     private Stats getStats(final Collection<DbRating> ratings) {

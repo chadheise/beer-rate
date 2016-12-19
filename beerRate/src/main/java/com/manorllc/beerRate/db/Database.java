@@ -1,8 +1,10 @@
 package com.manorllc.beerRate.db;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -12,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.joda.time.DateTime;
+
+import com.manorllc.beerRate.model.Rating;
 
 /**
  * Simple implementation of the database in memory. Note: Not thread safe! Not
@@ -39,7 +43,7 @@ public class Database {
     // Team ID -> Collection of User IDs
     private Map<UUID, Set<UUID>> usersByTeam = new HashMap<>();
 
-    public Optional<UUID> getCategoryId(final String categoryName) {
+    private Optional<UUID> getCategoryId(final String categoryName) {
         for (Entry<UUID, DbCategory> categoryEntry : categories.entrySet()) {
             UUID id = categoryEntry.getKey();
             DbCategory category = categoryEntry.getValue();
@@ -59,7 +63,7 @@ public class Database {
         beersByCategory.put(id, new HashSet<>());
     }
 
-    public Optional<UUID> getBeerId(final String beerName) {
+    private Optional<UUID> getBeerId(final String beerName) {
         for (Entry<UUID, DbBeer> beerEntry : beers.entrySet()) {
             UUID id = beerEntry.getKey();
             DbBeer beer = beerEntry.getValue();
@@ -87,14 +91,6 @@ public class Database {
         }
     }
 
-    public Optional<DbBeer> getBeer(final String beerName) {
-        Optional<UUID> beerIdOpt = getBeerId(beerName);
-        if (beerIdOpt.isPresent()) {
-            return Optional.of(beers.get(beerIdOpt.get()));
-        }
-        return Optional.empty();
-    }
-
     /**
      * Returns a map of beer category -> collection of beers in that category
      * 
@@ -109,6 +105,19 @@ public class Database {
         }
 
         return beerMap;
+    }
+
+    public Map<String, String> getBeerToCategory() {
+        Map<String, String> beerToCategory = new HashMap<>();
+
+        for (Entry<String, Collection<DbBeer>> entry : getBeersByCategory().entrySet()) {
+            String categoryName = entry.getKey();
+            for (DbBeer beer : entry.getValue()) {
+                beerToCategory.put(beer.getName(), categoryName);
+            }
+        }
+
+        return beerToCategory;
     }
 
     public Collection<DbBeer> getBeersForCategory(final String categoryName) {
@@ -276,6 +285,37 @@ public class Database {
         return teams.values();
     }
 
+    /**
+     * Returns all ratings sorted by creation time.
+     */
+    public List<Rating> getRatings() {
+        List<Rating> allRatings = new ArrayList<>();
+
+        for (Entry<UUID, Map<UUID, UUID>> entry : userRatings.entrySet()) {
+            UUID userId = entry.getKey();
+            for (Entry<UUID, UUID> beerIdToRating : entry.getValue().entrySet()) {
+                UUID beerId = beerIdToRating.getKey();
+                UUID ratingId = beerIdToRating.getValue();
+
+                Rating rating = new Rating();
+                rating.setBeerName(beers.get(beerId).getName());
+                rating.setRating(ratings.get(ratingId).getRating());
+                rating.setUpdated(ratings.get(ratingId).getUpdated());
+                rating.setCreated(ratings.get(ratingId).getCreated());
+                rating.setUserFirstName(users.get(userId).getFirstName());
+                rating.setUserLastName(users.get(userId).getLastName());
+
+                allRatings.add(rating);
+            }
+        }
+
+        allRatings.sort((r1, r2) -> {
+            return r1.getCreated().compareTo(r2.getCreated());
+        });
+
+        return allRatings;
+    }
+
     public void addRating(final String firstName, final String lastName, final String beerName,
             final double ratingValue) {
         Optional<UUID> userIdOpt = getUserId(firstName, lastName);
@@ -314,23 +354,55 @@ public class Database {
      *            the name of the beer to get ratings for
      * @return a map of user name to its rating
      */
-    public Map<String, DbRating> getRatingsForBeer(final String beerName) {
+    public Map<DbUser, DbRating> getRatingsForBeer(final String beerName) {
         Optional<UUID> beerIdOpt = getBeerId(beerName);
         if (!beerIdOpt.isPresent()) {
             throw new RuntimeException(String.format("Beer %s does not exist", beerName));
         }
         UUID beerId = beerIdOpt.get();
 
-        Map<String, DbRating> ratingMap = new HashMap<>();
+        Map<DbUser, DbRating> ratingMap = new HashMap<>();
         for (Entry<UUID, Map<UUID, UUID>> userRating : userRatings.entrySet()) {
             UUID userId = userRating.getKey();
             for (Entry<UUID, UUID> beerRating : userRating.getValue().entrySet()) {
                 UUID thisBeerId = beerRating.getKey();
                 UUID ratingId = beerRating.getValue();
                 if (beerId.equals(thisBeerId)) {
-                    String fullName = users.get(userId).getFirstName() + " " + users.get(userId).getLastName();
-                    ratingMap.put(fullName, ratings.get(ratingId));
+                    ratingMap.put(users.get(userId), ratings.get(ratingId));
                 }
+            }
+        }
+        return ratingMap;
+    }
+
+    public Map<DbRating, DbUser> getRatingToUser(final String beerName) {
+        Optional<UUID> beerIdOpt = getBeerId(beerName);
+        if (!beerIdOpt.isPresent()) {
+            throw new RuntimeException(String.format("Beer %s does not exist", beerName));
+        }
+        UUID beerId = beerIdOpt.get();
+
+        Map<DbRating, DbUser> ratingMap = new HashMap<>();
+        for (Entry<UUID, Map<UUID, UUID>> userRating : userRatings.entrySet()) {
+            UUID userId = userRating.getKey();
+            for (Entry<UUID, UUID> beerRating : userRating.getValue().entrySet()) {
+                UUID thisBeerId = beerRating.getKey();
+                UUID ratingId = beerRating.getValue();
+                if (beerId.equals(thisBeerId)) {
+                    ratingMap.put(ratings.get(ratingId), users.get(userId));
+                }
+            }
+        }
+        return ratingMap;
+    }
+
+    public Map<DbRating, DbBeer> getRatingToBeer() {
+        Map<DbRating, DbBeer> ratingMap = new HashMap<>();
+        for (Entry<UUID, Map<UUID, UUID>> userRating : userRatings.entrySet()) {
+            for (Entry<UUID, UUID> beerRating : userRating.getValue().entrySet()) {
+                UUID beerId = beerRating.getKey();
+                UUID ratingId = beerRating.getValue();
+                ratingMap.put(ratings.get(ratingId), beers.get(beerId));
             }
         }
         return ratingMap;
