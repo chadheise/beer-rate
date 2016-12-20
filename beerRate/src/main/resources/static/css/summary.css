@@ -16,7 +16,7 @@ body {
 	background-color: DarkRed;
 	display: inline-block;
 	vertical-align: top;
-	border: 5px solid black;
+    border: 2px solid black;
 	color: white;
 	width: 29%;
 	height: 45%;
@@ -30,6 +30,7 @@ body {
     margin: 0px;
     text-align: center;
     padding: 1% 0% 1% 0%;
+    font-size: 30px;
 }
 
 .category ul {
@@ -40,21 +41,20 @@ body {
 .beerDiv {
 	display: inline-block;
 	vertical-align: top;
-    border: 1px solid black;
     width: 45%;
     height: 45%;
     margin: 1%;
     padding: 5px;
 }
 
+.beerDiv h3 {
+	font-size: 25px;
+}
+
 h1 {
 	color: white;
 	text-align: center;
-}
-
-h3 {
-	font-size: 50%;
-	margin: 0px;
+	font-size: 35px;
 }
 
 p {
@@ -73,4 +73,13 @@ li {
     margin: 5px;
     width: 50%;
     height: 45%;
+}
+
+.beerInfo {
+	font-style: italic;
+}
+
+.ratingInfo {
+	margin-top: 15px;
+	font-size: 20px;
 }
