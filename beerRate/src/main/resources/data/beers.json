@@ -6,7 +6,7 @@
 			"style": "American Lager"
 		},
 		{
-			"name": "Capital Winter Skal",
+			"name": "Winter Skal",
 			"brewery": "Capital Brewing",
 			"style": "Amber Lager"
 		},
@@ -55,14 +55,14 @@
 			"style": "Sour Ale"
 		},
 		{
-			"name": "Woodchuck Anmber Hard Cider",
+			"name": "Woodchuck Amber Hard Cider",
 			"brewery": "Woodchuck Cidery",
 			"style": "Cider"
 		}
 	],
 	"Wheat Beers": [
 		{
-			"name": "Lagunitas Little Sumpin Sumpin Ale",
+			"name": "Little Sumpin Sumpin Ale",
 			"brewery": "Lagunitas Brewing Co",
 			"style": "Pale Wheat Ale"
 		},
@@ -107,7 +107,7 @@
 			"style": "American Porter"
 		},
 		{
-			"name": "Brau Brothers Moo Joos Oatmeal Milk Stout",
+			"name": "Moo Joos Oatmeal Milk Stout",
 			"brewery": "Brau Brothers Brewing Co.",
 			"style": "Oatmeal/Milk Stout"
 		},
