@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
@@ -30,6 +34,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 public class ApiHandlers {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiHandlers.class);
 
     private static final double MIN_RATING = 0;
     private static final double MAX_RATING = 5;
@@ -242,6 +248,28 @@ public class ApiHandlers {
                 response.end();
             }
         }
+    }
+
+    public void getFirstRatingByCategory(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        // Category -> First rating in that category
+        Map<String, Rating> firstRatings = new HashMap<>();
+        Map<String, String> beerToCategory = db.getBeerToCategory();
+        Set<String> firstUsers = new HashSet<>();
+        List<Rating> ratings = db.getRatings();
+
+        for (Rating rating : ratings) {
+            String categoryName = beerToCategory.get(rating.getBeerName());
+            if (!firstRatings.containsKey(categoryName) && !firstUsers.contains(rating.getUserName())) {
+                firstRatings.put(categoryName, rating);
+                firstUsers.add(rating.getUserName());
+            }
+        }
+
+        writeResponse(response, HttpResponseStatus.OK);
+        response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
+        response.end(Json.encodePrettily(firstRatings));
     }
 
     public void postRatingFromForm(final RoutingContext routingContext) {

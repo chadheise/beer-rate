@@ -106,6 +106,9 @@ public class Server extends AbstractVerticle {
                 .produces(HttpConstants.HEADER_VALUE_JSON)
                 .handler(apiHandlers::putRating);
 
+        router.get("/firstRatings")
+                .handler(apiHandlers::getFirstRatingByCategory);
+
         router.post("/forms/ratings")
                 .handler(apiHandlers::postRatingFromForm);
 
