@@ -21,6 +21,7 @@ import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Rating;
 import com.manorllc.beerRate.model.Stats;
 import com.manorllc.beerRate.model.Team;
+import com.manorllc.beerRate.util.Utils;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerResponse;
@@ -134,7 +135,7 @@ public class ApiHandlers {
         HttpServerResponse response = routingContext.response();
         writeResponse(response, HttpResponseStatus.OK);
         response.putHeader(HttpConstants.HEADER_KEY_CONTENT_TYPE, HttpConstants.HEADER_VALUE_JSON);
-        response.end(Json.encodePrettily(db.getUsersByTeam()));
+        response.end(Json.encodePrettily(db.getTeams()));
     }
 
     public void putTeam(final RoutingContext ctx) {
@@ -349,6 +350,21 @@ public class ApiHandlers {
                 response.end();
             }
 
+        });
+    }
+
+    public void setCaptainFromForm(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+        ctx.request().setExpectMultipart(true);
+        ctx.request().endHandler(v -> {
+            String userName = ctx.request().formAttributes().get("user");
+            String firstName = Utils.getFirstName(userName);
+            String lastName = Utils.getLastName(userName);
+            db.setTeamCaptain(firstName, lastName);
+
+            writeResponse(response, HttpResponseStatus.FOUND);
+            response.putHeader("Location", "/ui/hostFormSuccess");
+            response.end();
         });
     }
 

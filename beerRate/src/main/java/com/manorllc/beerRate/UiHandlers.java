@@ -20,6 +20,7 @@ import com.manorllc.beerRate.model.Team;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.TemplateEngine;
 
@@ -121,8 +122,10 @@ public class UiHandlers {
     public void host(final RoutingContext ctx) {
 
         ctx.put("users", sortUsers(db.getUsers()));
-        ctx.put("teams", sortTeams(db.getTeams()));
+        ctx.put("teams", db.getTeams());
         ctx.put("generations", Generation.values());
+
+        System.out.println(Json.encodePrettily(db.getTeams()));
 
         templateEngine.render(ctx, "templates/host.html", res -> {
             if (res.succeeded()) {

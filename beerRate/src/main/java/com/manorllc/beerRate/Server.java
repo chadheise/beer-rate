@@ -121,6 +121,9 @@ public class Server extends AbstractVerticle {
         router.post("/forms/teamStats")
                 .handler(apiHandlers::teamStatsFromForm);
 
+        router.post("/forms/captain")
+                .handler(apiHandlers::setCaptainFromForm);
+
         router.get("/stats")
                 .handler(apiHandlers::getAllStats);
     }

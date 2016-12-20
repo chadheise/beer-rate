@@ -23,4 +23,9 @@ $(document).ready(function() {
 		$("#teamStatsForm").show();
 	});
 	
+	$("#captainButton").click(function () {
+		$(".form").hide();
+		$("#captainForm").show();
+	});
+	
 });

@@ -52,6 +52,17 @@
 				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>
+
+		<p id="captainButton" class="button">Set Team Captain</p>
+		<form id="captainForm" class="form" method="post" action="/forms/captain">
+			<select name="user">
+			<option selected disabled>Choose the user who should be a captain</option>
+			 <optgroup th:each="team : ${teams}" th:label="${team.name}"  th:object="${team}">
+			     <option th:each="userName : *{members}" th:text="${userName}">Member</option>
+			 </optgroup>
+			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
+		</form>
+
 	</div>
 </body>
 

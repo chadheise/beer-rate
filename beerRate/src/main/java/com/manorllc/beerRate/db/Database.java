@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
@@ -325,8 +326,16 @@ public class Database {
         return userCollection;
     }
 
-    public Collection<DbTeam> getTeams() {
-        return teams.values();
+    public List<Team> getTeams() {
+        List<Team> teamList = teams.values().stream().map((Function<DbTeam, Team>) dbTeam -> {
+            return getTeam(dbTeam.getName()).get();
+        }).collect(Collectors.toList());
+
+        teamList.sort((t1, t2) -> {
+            return t1.getName().compareTo(t2.getName());
+        });
+
+        return teamList;
     }
 
     /**
@@ -415,18 +424,18 @@ public class Database {
         return beerRatings;
     }
 
-    public void setTeamCaptain(final String teamName, final String captainFirstName, final String captainLastName) {
-        Optional<UUID> teamIdOpt = getTeamId(teamName);
-        if (!teamIdOpt.isPresent()) {
-            throw new RuntimeException(String.format("Team %s does not exist", teamName));
-        }
-        UUID teamId = teamIdOpt.get();
-
-        Optional<UUID> userIdOpt = getUserId(captainFirstName, captainLastName);
+    public void setTeamCaptain(final String firstName, final String lastName) {
+        Optional<UUID> userIdOpt = getUserId(firstName, lastName);
         if (!userIdOpt.isPresent()) {
-            throw new RuntimeException(String.format("User %s %s does not exist", captainFirstName, captainLastName));
+            throw new RuntimeException(String.format("User %s %s does not exist", firstName, lastName));
         }
         UUID userId = userIdOpt.get();
+
+        Optional<Team> teamOpt = getTeamForUser(firstName, lastName);
+        if (!teamOpt.isPresent()) {
+            throw new RuntimeException(String.format("User %s %s does not belong to a team", firstName, lastName));
+        }
+        UUID teamId = getTeamId(teamOpt.get().getName()).get();
 
         captains.put(teamId, userId);
     }
