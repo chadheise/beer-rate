@@ -11,11 +11,12 @@ import java.util.stream.Collectors;
 
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
-import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbTeam;
 import com.manorllc.beerRate.db.DbUser;
+import com.manorllc.beerRate.model.Beer;
 import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Stats;
+import com.manorllc.beerRate.model.Team;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerResponse;
@@ -97,13 +98,13 @@ public class UiHandlers {
         Stats overallStats = queries.getStatsForAll();
         overallMap.put("stats", overallStats);
 
-        Map<String, Collection<DbBeer>> beersByCategory = db.getBeersByCategory();
+        Map<String, Collection<Beer>> beersByCategory = db.getBeersByCategory();
         ctx.put("beersByCategory", beersByCategory);
 
         Map<String, Stats> beerStats = new HashMap<>();
-        Collection<DbBeer> beers = beersByCategory.values().stream().flatMap(b -> b.stream())
+        Collection<Beer> beers = beersByCategory.values().stream().flatMap(b -> b.stream())
                 .collect(Collectors.toList());
-        for (DbBeer beer : beers) {
+        for (Beer beer : beers) {
             beerStats.put(beer.getName(), queries.getStatsForBeer(beer.getName()).get());
         }
         ctx.put("beerStats", beerStats);
@@ -149,12 +150,12 @@ public class UiHandlers {
             String teamName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_TEAM),
                     HttpConstants.ENCODING);
 
-            Optional<DbTeam> teamOpt = db.getTeam(teamName);
+            Optional<Team> teamOpt = db.getTeam(teamName);
             if (!teamOpt.isPresent()) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
                 response.end(String.format("Team %s does not exist", teamName));
             } else {
-                DbTeam team = teamOpt.get();
+                Team team = teamOpt.get();
                 ctx.put("team", team);
 
                 List<DbUser> users = sortUsers(db.getUsersForTeam(team.getName()));

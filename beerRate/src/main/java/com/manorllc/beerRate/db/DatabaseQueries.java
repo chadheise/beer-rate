@@ -11,7 +11,10 @@ import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.SynchronizedSummaryStatistics;
 
+import com.manorllc.beerRate.model.Beer;
+import com.manorllc.beerRate.model.Rating;
 import com.manorllc.beerRate.model.Stats;
+import com.manorllc.beerRate.util.Utils;
 
 public class DatabaseQueries {
 
@@ -25,7 +28,7 @@ public class DatabaseQueries {
         if (!db.beerExists(beerName)) {
             return Optional.empty();
         } else {
-            Collection<DbRating> ratings = db.getRatingsForBeer(beerName).values();
+            Collection<Rating> ratings = db.getRatingsForBeer(beerName);
             Stats stats = getStats(ratings);
             return Optional.of(stats);
         }
@@ -35,10 +38,10 @@ public class DatabaseQueries {
         if (!db.categoryExists(categoryName)) {
             return Optional.empty();
         } else {
-            Collection<DbBeer> beers = db.getBeersForCategory(categoryName);
-            Collection<DbRating> ratings = new HashSet<>();
+            Collection<Beer> beers = db.getBeersForCategory(categoryName);
+            Collection<Rating> ratings = new HashSet<>();
             beers.forEach(beer -> {
-                ratings.addAll(db.getRatingsForBeer(beer.getName()).values());
+                ratings.addAll(db.getRatingsForBeer(beer.getName()));
             });
             Stats stats = getStats(ratings);
             return Optional.of(stats);
@@ -46,14 +49,14 @@ public class DatabaseQueries {
     }
 
     public Stats getStatsForAll() {
-        Collection<DbBeer> beers = new HashSet<>();
+        Collection<Beer> beers = new HashSet<>();
         db.getBeersByCategory().values().forEach(col -> {
             beers.addAll(col);
         });
 
-        Collection<DbRating> ratings = new HashSet<>();
+        Collection<Rating> ratings = new HashSet<>();
         beers.forEach(beer -> {
-            ratings.addAll(db.getRatingsForBeer(beer.getName()).values());
+            ratings.addAll(db.getRatingsForBeer(beer.getName()));
         });
 
         Stats stats = getStats(ratings);
@@ -77,13 +80,12 @@ public class DatabaseQueries {
             if (!captains.containsKey(categoryName)) {
                 // Ignore members of the Heise family as they should not be
                 // captains
-                if (!rating.getUserLastName().equalsIgnoreCase("Heise")) {
-                    String fullName = rating.getUserFirstName() + " " + rating.getUserLastName();
+                if (!Utils.getFirstName(rating.getUserName()).equalsIgnoreCase("Heise")) {
                     // Only add them as a captain if they are not captain of
                     // another team
-                    if (!captainSet.contains(fullName)) {
-                        captains.put(categoryName, fullName);
-                        captainSet.add(fullName);
+                    if (!captainSet.contains(rating.getUserName())) {
+                        captains.put(categoryName, rating.getUserName());
+                        captainSet.add(rating.getUserName());
                     }
                 }
             }
@@ -92,7 +94,7 @@ public class DatabaseQueries {
         return captains;
     }
 
-    private Stats getStats(final Collection<DbRating> ratings) {
+    private Stats getStats(final Collection<Rating> ratings) {
         Stats stats = new Stats();
         stats.setCount(ratings.size());
 

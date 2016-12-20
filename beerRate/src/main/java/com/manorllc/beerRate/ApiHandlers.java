@@ -16,9 +16,11 @@ import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
 import com.manorllc.beerRate.db.DbBeer;
 import com.manorllc.beerRate.db.DbUser;
+import com.manorllc.beerRate.model.Beer;
 import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Rating;
 import com.manorllc.beerRate.model.Stats;
+import com.manorllc.beerRate.model.Team;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerResponse;
@@ -102,9 +104,9 @@ public class ApiHandlers {
             j.put("firstName", u.getFirstName());
             j.put("lastName", u.getLastName());
             j.put("generation", u.getGeneration());
-            Optional<String> teamOpt = db.getTeamForUser(u.getFirstName(), u.getLastName());
+            Optional<Team> teamOpt = db.getTeamForUser(u.getFirstName(), u.getLastName());
             if (teamOpt.isPresent()) {
-                j.put("team", teamOpt.get());
+                j.put("team", teamOpt.get().getName());
             } else {
                 j.put("team", "None");
             }
@@ -366,15 +368,15 @@ public class ApiHandlers {
         Stats overallStats = queries.getStatsForAll();
         overallMap.put("stats", overallStats);
 
-        Map<String, Collection<DbBeer>> beersByCategory = db.getBeersByCategory();
-        for (Entry<String, Collection<DbBeer>> entry : beersByCategory.entrySet()) {
+        Map<String, Collection<Beer>> beersByCategory = db.getBeersByCategory();
+        for (Entry<String, Collection<Beer>> entry : beersByCategory.entrySet()) {
             Map<String, Object> categoryMap = new HashMap<>();
             categoryMap.put("stats", queries.getStatsForCategory(entry.getKey()).get());
-            List<DbBeer> beerList = new ArrayList<DbBeer>(entry.getValue());
+            List<Beer> beerList = new ArrayList<Beer>(entry.getValue());
             beerList.sort((o1, o2) -> {
                 return o1.getName().compareTo(o2.getName());
             });
-            for (DbBeer dbBeer : beerList) {
+            for (Beer dbBeer : beerList) {
                 categoryMap.put(dbBeer.getName(), queries.getStatsForBeer(dbBeer.getName()).get());
             }
             overallMap.put(entry.getKey(), categoryMap);

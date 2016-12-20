@@ -15,7 +15,10 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.joda.time.DateTime;
 
+import com.manorllc.beerRate.model.Beer;
 import com.manorllc.beerRate.model.Rating;
+import com.manorllc.beerRate.model.Team;
+import com.manorllc.beerRate.util.Utils;
 
 /**
  * Simple implementation of the database in memory. Note: Not thread safe! Not
@@ -34,14 +37,16 @@ public class Database {
 
     // Model relationships
 
+    private ConcurrentMap<UUID, DbUser> captains = new ConcurrentHashMap<>();
+
     // Category ID -> Collection of beer IDs
-    private Map<UUID, Collection<UUID>> beersByCategory = new HashMap<>();
+    private ConcurrentMap<UUID, Collection<UUID>> beersByCategory = new ConcurrentHashMap<>();
 
     // User ID -> Beer ID -> Rating ID
-    private Map<UUID, Map<UUID, UUID>> userRatings = new HashMap<>();
+    private ConcurrentMap<UUID, Map<UUID, UUID>> userRatings = new ConcurrentHashMap<>();
 
     // Team ID -> Collection of User IDs
-    private Map<UUID, Set<UUID>> usersByTeam = new HashMap<>();
+    private ConcurrentMap<UUID, Set<UUID>> usersByTeam = new ConcurrentHashMap<>();
 
     private Optional<UUID> getCategoryId(final String categoryName) {
         for (Entry<UUID, DbCategory> categoryEntry : categories.entrySet()) {
@@ -96,8 +101,8 @@ public class Database {
      * 
      * @return a map of beer category -> collection of beers in that category
      */
-    public Map<String, Collection<DbBeer>> getBeersByCategory() {
-        Map<String, Collection<DbBeer>> beerMap = new HashMap<>();
+    public Map<String, Collection<Beer>> getBeersByCategory() {
+        Map<String, Collection<Beer>> beerMap = new HashMap<>();
         for (Entry<UUID, Collection<UUID>> entry : beersByCategory.entrySet()) {
             UUID categoryId = entry.getKey();
             String categoryName = categories.get(categoryId).getName();
@@ -110,9 +115,9 @@ public class Database {
     public Map<String, String> getBeerToCategory() {
         Map<String, String> beerToCategory = new HashMap<>();
 
-        for (Entry<String, Collection<DbBeer>> entry : getBeersByCategory().entrySet()) {
+        for (Entry<String, Collection<Beer>> entry : getBeersByCategory().entrySet()) {
             String categoryName = entry.getKey();
-            for (DbBeer beer : entry.getValue()) {
+            for (Beer beer : entry.getValue()) {
                 beerToCategory.put(beer.getName(), categoryName);
             }
         }
@@ -120,22 +125,22 @@ public class Database {
         return beerToCategory;
     }
 
-    public Collection<DbBeer> getBeersForCategory(final String categoryName) {
+    public Collection<Beer> getBeersForCategory(final String categoryName) {
         Optional<UUID> categoryOpt = getCategoryId(categoryName);
         if (!categoryOpt.isPresent()) {
             throw new RuntimeException(String.format("Category %s does not exists", categoryName));
         }
         UUID categoryId = categoryOpt.get();
 
-        Collection<DbBeer> beerCollection = new HashSet<>();
+        Collection<Beer> beerCollection = new HashSet<>();
         beersByCategory.get(categoryId).forEach(beerId -> {
-            beerCollection.add(beers.get(beerId));
+            beerCollection.add(Utils.createBeer(beers.get(beerId), categoryName));
         });
 
         return beerCollection;
     }
 
-    public Optional<UUID> getTeamId(final String teamName) {
+    private Optional<UUID> getTeamId(final String teamName) {
         for (Entry<UUID, DbTeam> teamEntry : teams.entrySet()) {
             UUID id = teamEntry.getKey();
             DbTeam team = teamEntry.getValue();
@@ -146,10 +151,23 @@ public class Database {
         return Optional.empty();
     }
 
-    public Optional<DbTeam> getTeam(final String teamName) {
+    public Optional<Team> getTeam(final String teamName) {
         Optional<UUID> teamIdOpt = getTeamId(teamName);
         if (teamIdOpt.isPresent()) {
-            return Optional.of(teams.get(teamIdOpt.get()));
+            Team team = new Team();
+            team.setName(teams.get(teamIdOpt.get()).getName());
+
+            if (captains.containsKey(teamIdOpt.get())) {
+                DbUser captain = captains.get(teamIdOpt.get());
+                team.setCaptain(Utils.getFullName(captain));
+            }
+
+            usersByTeam.get(teamIdOpt.get()).forEach(userId -> {
+                team.addMember(Utils.getFullName(users.get(userId)));
+
+            });
+
+            return Optional.of(team);
         }
         return Optional.empty();
     }
@@ -164,7 +182,7 @@ public class Database {
     }
 
     // Assumes first and last name combination is unique
-    public Optional<UUID> getUserId(final String firstName, final String lastName) {
+    private Optional<UUID> getUserId(final String firstName, final String lastName) {
         for (Entry<UUID, DbUser> userEntry : users.entrySet()) {
             UUID id = userEntry.getKey();
             DbUser user = userEntry.getValue();
@@ -207,7 +225,7 @@ public class Database {
         UUID teamId = teamIdOpt.get();
 
         // Check if user belongs to another team
-        Optional<String> teamOpt = getTeamForUser(firstName, lastName);
+        Optional<Team> teamOpt = getTeamForUser(firstName, lastName);
         if (teamOpt.isPresent()) {
             throw new RuntimeException(String.format("User %s %s already belongs to team %s", firstName,
                     lastName, teamOpt.get()));
@@ -217,12 +235,12 @@ public class Database {
     }
 
     public void removeUserFromTeam(final String firstName, final String lastName) {
-        Optional<String> teamOpt = getTeamForUser(firstName, lastName);
+        Optional<Team> teamOpt = getTeamForUser(firstName, lastName);
         if (!teamOpt.isPresent()) {
             throw new RuntimeException(String.format("User %s %s is not on a team", firstName,
                     lastName));
         }
-        UUID teamId = getTeamId(teamOpt.get()).get();
+        UUID teamId = getTeamId(teamOpt.get().getName()).get();
         UUID thisUserId = getUserId(firstName, lastName).get();
 
         usersByTeam.get(teamId).remove(thisUserId);
@@ -232,7 +250,7 @@ public class Database {
         return users.values();
     }
 
-    public Optional<String> getTeamForUser(final String firstName, final String lastName) {
+    public Optional<Team> getTeamForUser(final String firstName, final String lastName) {
         Optional<UUID> userIdOpt = getUserId(firstName, lastName);
         if (!userIdOpt.isPresent()) {
             throw new RuntimeException(String.format("User %s %s does not exists", firstName, lastName));
@@ -243,7 +261,7 @@ public class Database {
             UUID currentTeamId = entry.getKey();
             for (UUID currentUserId : entry.getValue()) {
                 if (currentUserId.equals(userId)) {
-                    return Optional.of(teams.get(currentTeamId).getName());
+                    return getTeam(teams.get(currentTeamId).getName());
                 }
             }
         }
@@ -296,16 +314,7 @@ public class Database {
             for (Entry<UUID, UUID> beerIdToRating : entry.getValue().entrySet()) {
                 UUID beerId = beerIdToRating.getKey();
                 UUID ratingId = beerIdToRating.getValue();
-
-                Rating rating = new Rating();
-                rating.setBeerName(beers.get(beerId).getName());
-                rating.setRating(ratings.get(ratingId).getRating());
-                rating.setUpdated(ratings.get(ratingId).getUpdated());
-                rating.setCreated(ratings.get(ratingId).getCreated());
-                rating.setUserFirstName(users.get(userId).getFirstName());
-                rating.setUserLastName(users.get(userId).getLastName());
-
-                allRatings.add(rating);
+                allRatings.add(createRating(beerId, ratingId, userId));
             }
         }
 
@@ -354,83 +363,30 @@ public class Database {
      *            the name of the beer to get ratings for
      * @return a map of user name to its rating
      */
-    public Map<DbUser, DbRating> getRatingsForBeer(final String beerName) {
+    public List<Rating> getRatingsForBeer(final String beerName) {
         Optional<UUID> beerIdOpt = getBeerId(beerName);
         if (!beerIdOpt.isPresent()) {
             throw new RuntimeException(String.format("Beer %s does not exist", beerName));
         }
         UUID beerId = beerIdOpt.get();
 
-        Map<DbUser, DbRating> ratingMap = new HashMap<>();
+        List<Rating> beerRatings = new ArrayList<>();
         for (Entry<UUID, Map<UUID, UUID>> userRating : userRatings.entrySet()) {
             UUID userId = userRating.getKey();
             for (Entry<UUID, UUID> beerRating : userRating.getValue().entrySet()) {
                 UUID thisBeerId = beerRating.getKey();
                 UUID ratingId = beerRating.getValue();
                 if (beerId.equals(thisBeerId)) {
-                    ratingMap.put(users.get(userId), ratings.get(ratingId));
+                    beerRatings.add(createRating(thisBeerId, ratingId, userId));
                 }
             }
         }
-        return ratingMap;
-    }
 
-    public Map<DbRating, DbUser> getRatingToUser(final String beerName) {
-        Optional<UUID> beerIdOpt = getBeerId(beerName);
-        if (!beerIdOpt.isPresent()) {
-            throw new RuntimeException(String.format("Beer %s does not exist", beerName));
-        }
-        UUID beerId = beerIdOpt.get();
+        beerRatings.sort((r1, r2) -> {
+            return r1.getCreated().compareTo(r2.getCreated());
+        });
 
-        Map<DbRating, DbUser> ratingMap = new HashMap<>();
-        for (Entry<UUID, Map<UUID, UUID>> userRating : userRatings.entrySet()) {
-            UUID userId = userRating.getKey();
-            for (Entry<UUID, UUID> beerRating : userRating.getValue().entrySet()) {
-                UUID thisBeerId = beerRating.getKey();
-                UUID ratingId = beerRating.getValue();
-                if (beerId.equals(thisBeerId)) {
-                    ratingMap.put(ratings.get(ratingId), users.get(userId));
-                }
-            }
-        }
-        return ratingMap;
-    }
-
-    public Map<DbRating, DbBeer> getRatingToBeer() {
-        Map<DbRating, DbBeer> ratingMap = new HashMap<>();
-        for (Entry<UUID, Map<UUID, UUID>> userRating : userRatings.entrySet()) {
-            for (Entry<UUID, UUID> beerRating : userRating.getValue().entrySet()) {
-                UUID beerId = beerRating.getKey();
-                UUID ratingId = beerRating.getValue();
-                ratingMap.put(ratings.get(ratingId), beers.get(beerId));
-            }
-        }
-        return ratingMap;
-    }
-
-    /**
-     * Returns a map of beer name to rating.
-     * 
-     * @param firstName
-     *            the user's first name
-     * @param lastName
-     *            the user's last name
-     * @return a map of beer name to its rating
-     */
-    public Map<String, DbRating> getRatingsForUser(final String firstName, final String lastName) {
-        Optional<UUID> userIdOpt = getUserId(firstName, lastName);
-        if (!userIdOpt.isPresent()) {
-            throw new RuntimeException(String.format("User %s %s does not exist", firstName, lastName));
-        }
-        UUID userId = userIdOpt.get();
-
-        Map<String, DbRating> ratingMap = new HashMap<>();
-        for (Entry<UUID, UUID> beerRating : userRatings.get(userId).entrySet()) {
-            UUID beerId = beerRating.getKey();
-            UUID ratingId = beerRating.getValue();
-            ratingMap.put(beers.get(beerId).getName(), ratings.get(ratingId));
-        }
-        return ratingMap;
+        return beerRatings;
     }
 
     public boolean categoryExists(final String categoryName) {
@@ -447,6 +403,16 @@ public class Database {
 
     public boolean userExists(final String firstName, final String lastName) {
         return getUserId(firstName, lastName).isPresent();
+    }
+
+    private Rating createRating(UUID beerId, UUID ratingId, UUID userId) {
+        Rating rating = new Rating();
+        rating.setBeerName(beers.get(beerId).getName());
+        rating.setRating(ratings.get(ratingId).getRating());
+        rating.setUpdated(ratings.get(ratingId).getUpdated());
+        rating.setCreated(ratings.get(ratingId).getCreated());
+        rating.setUserName(Utils.getFullName(users.get(userId)));
+        return rating;
     }
 
 }

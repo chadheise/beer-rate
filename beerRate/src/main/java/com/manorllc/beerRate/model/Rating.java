@@ -20,59 +20,16 @@ public class Rating {
     @JsonSerialize(using = CustomDateSerializer.class)
     private DateTime updated;
 
-    private String userFirstName;
-
-    private String userLastName;
+    private String userName;
 
     private String beerName;
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(31, 41)
-                .append(rating)
-                .append(created)
-                .append(userFirstName)
-                .append(userLastName)
-                .append(beerName)
-                .toHashCode();
+    public String getUserName() {
+        return userName;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (obj.getClass() != getClass()) {
-            return false;
-        }
-        Rating rhs = (Rating) obj;
-        return new EqualsBuilder()
-                .appendSuper(super.equals(obj))
-                .append(rating, rhs.rating)
-                .append(created, rhs.created)
-                .append(userFirstName, rhs.userFirstName)
-                .append(userLastName, rhs.userLastName)
-                .append(beerName, rhs.beerName)
-                .isEquals();
-    }
-
-    public String getUserFirstName() {
-        return userFirstName;
-    }
-
-    public void setUserFirstName(String userFirstName) {
-        this.userFirstName = userFirstName;
-    }
-
-    public String getUserLastName() {
-        return userLastName;
-    }
-
-    public void setUserLastName(String userLastName) {
-        this.userLastName = userLastName;
+    public void setUserName(String userFirstName) {
+        this.userName = userFirstName;
     }
 
     public String getBeerName() {
@@ -105,6 +62,37 @@ public class Rating {
 
     public void setUpdated(final DateTime updated) {
         this.updated = updated;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(31, 41)
+                .append(rating)
+                .append(created)
+                .append(userName)
+                .append(beerName)
+                .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        Rating rhs = (Rating) obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(rating, rhs.rating)
+                .append(created, rhs.created)
+                .append(userName, rhs.userName)
+                .append(beerName, rhs.beerName)
+                .isEquals();
     }
 
 }
