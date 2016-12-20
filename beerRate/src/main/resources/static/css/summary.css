@@ -24,11 +24,12 @@ body {
 	float: left;
 }
 
-category h2 {
-    height: 10%;
+.category h2 {
+	height: 7%;
     width: 100%;
-    margin: auto;
+    margin: 0px;
     text-align: center;
+    padding: 1% 0% 1% 0%;
 }
 
 .category ul {

@@ -2,7 +2,7 @@
     <h1>So-So Beery Christmas!</h1>
     
     <div class="category" th:each="beersByCategory : ${beersByCategory}" >
-        <h2 th:text="${beersByCategory.key}">Category</h2>    
+        <h2 th:text="${beersByCategory.key}">Category</h2>
         <ul>
             <li class="beerDiv" th:each="beer : ${beersByCategory.value}">
                     <h3 th:text="${beer.name}">Beer Name</h3>
