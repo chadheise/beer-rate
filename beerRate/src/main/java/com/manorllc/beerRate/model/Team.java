@@ -1,6 +1,7 @@
 package com.manorllc.beerRate.model;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -12,7 +13,7 @@ public class Team {
 
     private String captain;
 
-    private Set<String> members;
+    private Set<String> members = new HashSet<>();
 
     public String getCaptain() {
         return captain;
