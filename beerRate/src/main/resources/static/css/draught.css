@@ -10,6 +10,7 @@ body {
 	margin-right: auto;
 	vertical-align: top;
 	float: center;
+	border: 1px solid black;
 }
 
 .team {
@@ -19,7 +20,7 @@ body {
     border: 2px solid black;
 	color: white;
 	width: 30%;
-	height: 41%;
+	height: 39%;
 	margin: 1%;
 	float: left;
 	padding: 10px;
@@ -46,10 +47,11 @@ body {
     margin: 1%;
 }
 
-.beerDiv h3 {
+.team h3 {
 	font-size: 25px;
 	margin: 0px 0px 0px 0px;
 	padding: 0px 0px 0px 0px;
+	color: #A0A0A0;
 }
 
 h1 {

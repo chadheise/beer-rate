@@ -3,6 +3,7 @@
     
     <div class="team" th:each="team : ${teams}" >
         <h2 th:text="${team.name}">Team Name</h2>
+        <h3 th:text="|Captain: ${team.captain}|"></h3>
         <ol>
             <li class="member" th:each="user : ${team.members}" th:text="${user}">User</li>
         </ol>
