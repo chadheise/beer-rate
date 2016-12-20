@@ -37,7 +37,8 @@ public class Database {
 
     // Model relationships
 
-    private ConcurrentMap<UUID, DbUser> captains = new ConcurrentHashMap<>();
+    // Team ID -> user ID of captain
+    private ConcurrentMap<UUID, UUID> captains = new ConcurrentHashMap<>();
 
     // Category ID -> Collection of beer IDs
     private ConcurrentMap<UUID, Collection<UUID>> beersByCategory = new ConcurrentHashMap<>();
@@ -158,7 +159,7 @@ public class Database {
             team.setName(teams.get(teamIdOpt.get()).getName());
 
             if (captains.containsKey(teamIdOpt.get())) {
-                DbUser captain = captains.get(teamIdOpt.get());
+                DbUser captain = users.get(captains.get(teamIdOpt.get()));
                 team.setCaptain(Utils.getFullName(captain));
             }
 
@@ -387,6 +388,22 @@ public class Database {
         });
 
         return beerRatings;
+    }
+
+    public void setTeamCaptain(final String teamName, final String captainFirstName, final String captainLastName) {
+        Optional<UUID> teamIdOpt = getTeamId(teamName);
+        if (!teamIdOpt.isPresent()) {
+            throw new RuntimeException(String.format("Team %s does not exist", teamName));
+        }
+        UUID teamId = teamIdOpt.get();
+
+        Optional<UUID> userIdOpt = getUserId(captainFirstName, captainLastName);
+        if (!userIdOpt.isPresent()) {
+            throw new RuntimeException(String.format("User %s %s does not exist", captainFirstName, captainLastName));
+        }
+        UUID userId = userIdOpt.get();
+
+        captains.put(teamId, userId);
     }
 
     public boolean categoryExists(final String categoryName) {
