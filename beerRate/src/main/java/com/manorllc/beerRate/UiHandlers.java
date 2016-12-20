@@ -98,7 +98,7 @@ public class UiHandlers {
         Stats overallStats = queries.getStatsForAll();
         overallMap.put("stats", overallStats);
 
-        Map<String, Collection<Beer>> beersByCategory = db.getBeersByCategory();
+        Map<String, List<Beer>> beersByCategory = db.getBeersByCategory();
         ctx.put("beersByCategory", beersByCategory);
 
         Map<String, Stats> beerStats = new HashMap<>();

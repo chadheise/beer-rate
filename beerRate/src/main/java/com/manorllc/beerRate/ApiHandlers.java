@@ -47,7 +47,7 @@ public class ApiHandlers {
             String categoryName = URLDecoder.decode(ctx.request().getParam(HttpConstants.PARAM_CATEGORY),
                     HttpConstants.ENCODING);
 
-            if (db.teamExists(categoryName)) {
+            if (db.categoryExists(categoryName)) {
                 writeResponse(response, HttpResponseStatus.BAD_REQUEST);
                 response.end(String.format("Category %s already exist", categoryName));
             } else {
@@ -368,8 +368,8 @@ public class ApiHandlers {
         Stats overallStats = queries.getStatsForAll();
         overallMap.put("stats", overallStats);
 
-        Map<String, Collection<Beer>> beersByCategory = db.getBeersByCategory();
-        for (Entry<String, Collection<Beer>> entry : beersByCategory.entrySet()) {
+        Map<String, List<Beer>> beersByCategory = db.getBeersByCategory();
+        for (Entry<String, List<Beer>> entry : beersByCategory.entrySet()) {
             Map<String, Object> categoryMap = new HashMap<>();
             categoryMap.put("stats", queries.getStatsForCategory(entry.getKey()).get());
             List<Beer> beerList = new ArrayList<Beer>(entry.getValue());

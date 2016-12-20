@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
@@ -80,19 +81,39 @@ public class Database {
         return Optional.empty();
     }
 
-    public void addBeer(final String categoryName, final DbBeer beer) {
+    public Optional<Beer> getBeer(final String beerName) {
+        Optional<UUID> beerIdOpt = getBeerId(beerName);
+        if (beerIdOpt.isPresent()) {
+            UUID beerId = beerIdOpt.get();
+            DbBeer dbBeer = beers.get(beerId);
+
+            DbCategory category = null;
+            for (Entry<UUID, Collection<UUID>> entry : beersByCategory.entrySet()) {
+                UUID categoryId = entry.getKey();
+                if (entry.getValue().stream().collect(Collectors.toSet()).contains(beerId)) {
+                    category = categories.get(categoryId);
+                    break;
+                }
+
+            }
+            return Optional.of(Utils.createBeer(dbBeer, category.getName()));
+        }
+        return Optional.empty();
+    }
+
+    public void addBeer(final String categoryName, final DbBeer dbBeer) {
         Optional<UUID> categoryOpt = getCategoryId(categoryName);
         if (!categoryOpt.isPresent()) {
             throw new RuntimeException(String.format("Category %s does not exists", categoryName));
         }
         UUID categoryId = categoryOpt.get();
 
-        if (beerExists(beer.getName())) {
+        if (beerExists(dbBeer.getName())) {
             // TODO: Consider overwriting
-            throw new RuntimeException(String.format("Beer %s already exists", beer.getName()));
+            throw new RuntimeException(String.format("Beer %s already exists", dbBeer.getName()));
         } else {
             UUID beerId = UUID.randomUUID();
-            beers.put(beerId, beer);
+            beers.put(beerId, dbBeer);
             beersByCategory.get(categoryId).add(beerId);
         }
     }
@@ -102,8 +123,8 @@ public class Database {
      * 
      * @return a map of beer category -> collection of beers in that category
      */
-    public Map<String, Collection<Beer>> getBeersByCategory() {
-        Map<String, Collection<Beer>> beerMap = new HashMap<>();
+    public Map<String, List<Beer>> getBeersByCategory() {
+        Map<String, List<Beer>> beerMap = new HashMap<>();
         for (Entry<UUID, Collection<UUID>> entry : beersByCategory.entrySet()) {
             UUID categoryId = entry.getKey();
             String categoryName = categories.get(categoryId).getName();
@@ -116,7 +137,7 @@ public class Database {
     public Map<String, String> getBeerToCategory() {
         Map<String, String> beerToCategory = new HashMap<>();
 
-        for (Entry<String, Collection<Beer>> entry : getBeersByCategory().entrySet()) {
+        for (Entry<String, List<Beer>> entry : getBeersByCategory().entrySet()) {
             String categoryName = entry.getKey();
             for (Beer beer : entry.getValue()) {
                 beerToCategory.put(beer.getName(), categoryName);
@@ -126,19 +147,23 @@ public class Database {
         return beerToCategory;
     }
 
-    public Collection<Beer> getBeersForCategory(final String categoryName) {
+    public List<Beer> getBeersForCategory(final String categoryName) {
         Optional<UUID> categoryOpt = getCategoryId(categoryName);
         if (!categoryOpt.isPresent()) {
             throw new RuntimeException(String.format("Category %s does not exists", categoryName));
         }
         UUID categoryId = categoryOpt.get();
 
-        Collection<Beer> beerCollection = new HashSet<>();
+        List<Beer> beerList = new ArrayList<>();
         beersByCategory.get(categoryId).forEach(beerId -> {
-            beerCollection.add(Utils.createBeer(beers.get(beerId), categoryName));
+            beerList.add(Utils.createBeer(beers.get(beerId), categoryName));
         });
 
-        return beerCollection;
+        beerList.sort((b1, b2) -> {
+            return b1.getName().compareTo(b2.getName());
+        });
+
+        return beerList;
     }
 
     private Optional<UUID> getTeamId(final String teamName) {
