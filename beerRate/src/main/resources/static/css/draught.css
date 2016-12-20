@@ -18,10 +18,11 @@ body {
 	vertical-align: top;
     border: 2px solid black;
 	color: white;
-	width: 28%;
-	height: 43%;
+	width: 30%;
+	height: 41%;
 	margin: 1%;
-	padding: 1%;
+	float: left;
+	padding: 10px;
 }
 
 .team h2 {
