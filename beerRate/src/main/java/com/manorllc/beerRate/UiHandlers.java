@@ -2,6 +2,7 @@ package com.manorllc.beerRate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +111,41 @@ public class UiHandlers {
         ctx.put("beerStats", beerStats);
 
         templateEngine.render(ctx, "templates/summaryBody.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+    }
+
+    public void draught(final RoutingContext ctx) {
+        templateEngine.render(ctx, "templates/draught.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+    }
+
+    public void draughtBody(final RoutingContext ctx) {
+
+        List<Team> teams = new ArrayList<>();
+        db.getTeams().forEach(t -> {
+            if (!t.getName().equalsIgnoreCase("free agents")) {
+                teams.add(t);
+            }
+        });
+        teams.sort((t1, t2) -> {
+            return t1.getName().compareTo(t2.getName());
+        });
+        ctx.put("teams", teams);
+
+        Team freeAgents = db.getTeam("Free Agents").get();
+        ctx.put("freeAgents", freeAgents);
+
+        templateEngine.render(ctx, "templates/draughtBody.html", res -> {
             if (res.succeeded()) {
                 ctx.response().end(res.result());
             } else {

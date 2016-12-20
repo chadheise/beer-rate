@@ -62,6 +62,12 @@ public class Server extends AbstractVerticle {
         router.get("/ui/summary/body")
                 .handler(uiHandlers::summaryBody);
 
+        router.get("/ui/draught/")
+                .handler(uiHandlers::draught);
+
+        router.get("/ui/draught/body")
+                .handler(uiHandlers::draughtBody);
+
         router.get("/ui/host")
                 .handler(uiHandlers::host);
 

@@ -1,0 +1,18 @@
+<div class="container">
+    <h1>So-So Christmas Beer Draught</h1>
+    
+    <div class="team" th:each="team : ${teams}" >
+        <h2 th:text="${team.name}">Team Name</h2>
+        <ol>
+            <li class="member" th:each="user : ${team.members}" th:text="${user}">User</li>
+        </ol>
+    </div>
+    
+        <div class="team" >
+        <h2>Free Agents</h2>
+        <ol>
+            <li class="member" th:each="user : ${freeAgents.members}" th:text="${user}">User</li>
+        </ol>
+    </div>
+    
+</div>

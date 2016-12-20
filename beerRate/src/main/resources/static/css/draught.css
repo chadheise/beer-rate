@@ -1,0 +1,88 @@
+body {
+	background-color: #006837;
+	font-family: "Trebuchet MS", Helvetica, sans-serif /*{global-font-family}*/;
+}
+
+.container {
+	height: 1080px;
+	width: 1920px;
+	margin-left: auto;
+	margin-right: auto;
+	vertical-align: top;
+	float: center;
+}
+
+.team {
+	background-color: DarkRed;
+	display: inline-block;
+	vertical-align: top;
+    border: 2px solid black;
+	color: white;
+	width: 28%;
+	height: 43%;
+	margin: 1%;
+	padding: 1%;
+}
+
+.team h2 {
+	height: 7%;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    padding-top: 0px;
+    margin: 0px 0px 10px 0px
+}
+
+.category ol {
+	height: 90%;
+	width: 100%;
+}
+
+.member {
+	display: inline-block;
+	vertical-align: top;
+    width: 30%;
+    margin: 1%;
+}
+
+.beerDiv h3 {
+	font-size: 25px;
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+
+h1 {
+	color: white;
+	text-align: center;
+	font-size: 35px;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+p {
+	margin: 0px;
+}
+
+ol {
+	margin: 0px;
+	padding: 0px;
+	list-style-position: inside;
+	list-style-type: none;
+}
+
+li {
+	display: inline-block;
+    margin: 5px;
+    width: 50%;
+    height: 45%;
+}
+
+.beerInfo {
+	font-style: italic;
+	color: #A0A0A0
+}
+
+.ratingInfo {
+	margin-top: 15px;
+	font-size: 20px;
+}
