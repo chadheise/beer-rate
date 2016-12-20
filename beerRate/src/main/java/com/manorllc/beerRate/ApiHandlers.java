@@ -261,9 +261,11 @@ public class ApiHandlers {
 
         for (Rating rating : ratings) {
             String categoryName = beerToCategory.get(rating.getBeerName());
-            if (!firstRatings.containsKey(categoryName) && !firstUsers.contains(rating.getUserName())) {
-                firstRatings.put(categoryName, rating);
-                firstUsers.add(rating.getUserName());
+            if (!rating.getUserName().contains("Heise")) {
+                if (!firstRatings.containsKey(categoryName) && !firstUsers.contains(rating.getUserName())) {
+                    firstRatings.put(categoryName, rating);
+                    firstUsers.add(rating.getUserName());
+                }
             }
         }
 
