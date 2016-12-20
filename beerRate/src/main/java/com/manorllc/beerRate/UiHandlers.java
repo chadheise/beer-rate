@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.manorllc.beerRate.db.Database;
@@ -18,6 +20,7 @@ import com.manorllc.beerRate.model.Beer;
 import com.manorllc.beerRate.model.Generation;
 import com.manorllc.beerRate.model.Stats;
 import com.manorllc.beerRate.model.Team;
+import com.manorllc.beerRate.util.Utils;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerResponse;
@@ -157,8 +160,21 @@ public class UiHandlers {
     public void host(final RoutingContext ctx) {
 
         ctx.put("users", sortUsers(db.getUsers()));
-        ctx.put("teams", db.getTeams());
         ctx.put("generations", Generation.values());
+
+        List<Team> teams = new ArrayList<>();
+        db.getTeams().forEach(t -> {
+            if (!t.getName().equalsIgnoreCase("free agents")) {
+                teams.add(t);
+            }
+        });
+        teams.sort((t1, t2) -> {
+            return t1.getName().compareTo(t2.getName());
+        });
+        ctx.put("teams", teams);
+
+        Team freeAgents = db.getTeam("Free Agents").get();
+        ctx.put("freeAgents", freeAgents);
 
         templateEngine.render(ctx, "templates/host.html", res -> {
             if (res.succeeded()) {
@@ -195,9 +211,34 @@ public class UiHandlers {
                 ctx.put("team", team);
 
                 List<DbUser> users = sortUsers(db.getUsersForTeam(team.getName()));
-                ctx.put("users", users);
+                Set<String> userNames = users.stream().map(dbUser -> {
+                    return Utils.getFullName(dbUser.getFirstName(),
+                            dbUser.getLastName());
+                }).collect(Collectors.toSet());
 
-                // TODO: Get the desired stats for the team
+                Map<String, Integer> allGameOneStats = queries.getGameOneStats();
+                Map<String, Integer> gameOneTeamStats = new HashMap<>();
+                int gameOneTotal = 0;
+                for (Entry<String, Integer> userCount : allGameOneStats.entrySet()) {
+                    if (userNames.contains(userCount.getKey())) {
+                        gameOneTeamStats.put(userCount.getKey(), userCount.getValue());
+                        gameOneTotal += userCount.getValue();
+                    }
+                }
+                ctx.put("gameOneCounts", gameOneTeamStats);
+                ctx.put("gameOneTotal", gameOneTotal);
+
+                Map<String, Integer> allGameTwoStats = queries.getGameTwoStats();
+                Map<String, Integer> gameTwoTeamStats = new HashMap<>();
+                int gameTwoTotal = 0;
+                for (Entry<String, Integer> userCount : allGameTwoStats.entrySet()) {
+                    if (userNames.contains(userCount.getKey())) {
+                        gameTwoTeamStats.put(userCount.getKey(), userCount.getValue());
+                        gameTwoTotal += userCount.getValue();
+                    }
+                }
+                ctx.put("gameTwoCounts", gameTwoTeamStats);
+                ctx.put("gameTwoTotal", gameTwoTotal);
 
                 templateEngine.render(ctx, "templates/teamStats.html", res -> {
                     if (res.succeeded()) {

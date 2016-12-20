@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.SynchronizedSummaryStatistics;
+import org.joda.time.DateTime;
 
 import com.manorllc.beerRate.model.Beer;
 import com.manorllc.beerRate.model.Rating;
@@ -61,7 +62,56 @@ public class DatabaseQueries {
 
         Stats stats = getStats(ratings);
         return stats;
+    }
 
+    public Map<String, Integer> getGameOneStats() {
+        // user name -> number of checkins
+        Map<String, Integer> checkinCount = new HashMap<>();
+
+        DateTime gameMarker = db.getGameMarker();
+
+        // Initialize all users to 0
+        for (DbUser dbUser : db.getUsers()) {
+            checkinCount.put(Utils.getFullName(dbUser.getFirstName(), dbUser.getLastName()), 0);
+        }
+
+        for (Rating rating : db.getRatings()) {
+            if (gameMarker != null) {
+                if (rating.getCreated().isBefore(gameMarker)) {
+                    int currentCount = checkinCount.get(rating.getUserName());
+                    checkinCount.put(rating.getUserName(), currentCount + 1);
+                }
+            } else {
+                int currentCount = checkinCount.get(rating.getUserName());
+                checkinCount.put(rating.getUserName(), currentCount + 1);
+            }
+
+        }
+
+        return checkinCount;
+    }
+
+    public Map<String, Integer> getGameTwoStats() {
+        // user name -> number of checkins
+        Map<String, Integer> checkinCount = new HashMap<>();
+
+        DateTime gameMarker = db.getGameMarker();
+
+        // Initialize all users to 0
+        for (DbUser dbUser : db.getUsers()) {
+            checkinCount.put(Utils.getFullName(dbUser.getFirstName(), dbUser.getLastName()), 0);
+        }
+
+        for (Rating rating : db.getRatings()) {
+            if (gameMarker != null) {
+                if (rating.getCreated().isAfter(gameMarker)) {
+                    int currentCount = checkinCount.get(rating.getUserName());
+                    checkinCount.put(rating.getUserName(), currentCount + 1);
+                }
+            }
+        }
+
+        return checkinCount;
     }
 
     /**

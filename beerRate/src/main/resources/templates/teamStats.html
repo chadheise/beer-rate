@@ -25,10 +25,16 @@
 		
 		<div>
 		  <h2 th:text="|Captain: ${team.captain}|">Captain:</h2>
-		  <h2>Team members:</h2>
+		  <h2>Game 1 Stats:</h2>
 		  <ul>
-		      <li th:each="user : ${users}" th:text="|${user.firstName} ${user.lastName}|">User</li>
+		      <li th:each="count: ${gameOneCounts}" th:text="|${count.key}: ${count.value}|">User: # Check Ins</li>
 		  </ul>
+		  <p th:text="|Total: ${gameOneTotal}|"></p>
+		  <h2>Game 2 Stats:</h2>
+          <ul>
+              <li th:each="count: ${gameTwoCounts}" th:text="|${count.key}: ${count.value}|">User: # Check Ins</li>
+          </ul>
+          <p th:text="|Total: ${gameTwoTotal}|"></p>
 		</div>
 		
 		<div>

@@ -36,6 +36,7 @@ public class Database {
     private ConcurrentMap<UUID, DbTeam> teams = new ConcurrentHashMap<>();
     private ConcurrentMap<UUID, DbUser> users = new ConcurrentHashMap<>();
     private ConcurrentMap<UUID, DbRating> ratings = new ConcurrentHashMap<>();
+    private DateTime gameMarker = null;
 
     // Model relationships
 
@@ -438,6 +439,14 @@ public class Database {
         UUID teamId = getTeamId(teamOpt.get().getName()).get();
 
         captains.put(teamId, userId);
+    }
+
+    public void setGameMarker() {
+        gameMarker = DateTime.now();
+    }
+
+    public DateTime getGameMarker() {
+        return gameMarker;
     }
 
     public boolean categoryExists(final String categoryName) {

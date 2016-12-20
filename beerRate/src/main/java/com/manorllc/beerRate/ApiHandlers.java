@@ -353,7 +353,7 @@ public class ApiHandlers {
             String userName = routingContext.request().formAttributes().get("user");
             String firstName = userName.split(",")[1].trim();
             String lastName = userName.split(",")[0].trim();
-            String teamName = routingContext.request().formAttributes().get("team");
+            String teamName = routingContext.request().formAttributes().get("team").split("-")[0].trim();
 
             if (db.getTeamForUser(firstName, lastName).isPresent()) {
                 db.removeUserFromTeam(firstName, lastName);
@@ -391,6 +391,18 @@ public class ApiHandlers {
             String firstName = Utils.getFirstName(userName);
             String lastName = Utils.getLastName(userName);
             db.setTeamCaptain(firstName, lastName);
+
+            writeResponse(response, HttpResponseStatus.FOUND);
+            response.putHeader("Location", "/ui/hostFormSuccess");
+            response.end();
+        });
+    }
+
+    public void setGameMarkerFromForm(final RoutingContext ctx) {
+        HttpServerResponse response = ctx.response();
+        ctx.request().setExpectMultipart(true);
+        ctx.request().endHandler(v -> {
+            db.setGameMarker();
 
             writeResponse(response, HttpResponseStatus.FOUND);
             response.putHeader("Location", "/ui/hostFormSuccess");

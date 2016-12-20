@@ -28,4 +28,9 @@ $(document).ready(function() {
 		$("#captainForm").show();
 	});
 	
+	$("#gameMarkerButton").click(function () {
+		$(".form").hide();
+		$("#gameMarkerForm").show();
+	});
+	
 });

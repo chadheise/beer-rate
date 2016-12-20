@@ -42,7 +42,8 @@
 			<span>User:</span> <select name="user">
 				<option th:each="user : ${users}" th:text="|${user.lastName}, ${user.firstName}|">User</option>
 			</select> <span>Team:</span> <select name="team">
-				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
+				<option th:each="team : ${teams}" th:text="|${team.name} - ${team.captain}|">Team</option>
+				<option>Free Agents</option>
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>
 
@@ -62,6 +63,12 @@
 			 </optgroup>
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>
+		
+		<p id="gameMarkerButton" class="button">Set Game Marker</p>
+        <form id="gameMarkerForm" class="form" method="post" action="/forms/gameMarker">
+            <p> Press "submit" to mark the end of game 1 and start of game 2</p>
+            <input type="submit" data-inline="true" value="Submit" class="ui-btn">
+        </form>
 
 	</div>
 </body>
