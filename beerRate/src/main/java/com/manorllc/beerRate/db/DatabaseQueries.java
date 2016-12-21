@@ -161,7 +161,8 @@ public class DatabaseQueries {
 
         stats.setMin((int) summaryStats.getMin());
         stats.setMax((int) summaryStats.getMax());
-        stats.setMean(summaryStats.getMean());
+        double roundedMean = Math.round(summaryStats.getMean() * 100.0) / 100.0;
+        stats.setMean(roundedMean);
 
         return stats;
     }
