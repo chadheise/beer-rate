@@ -383,6 +383,16 @@ public class ApiHandlers {
         });
     }
 
+    public void gameStatsFromForm(final RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+        routingContext.request().setExpectMultipart(true);
+        routingContext.request().endHandler(v -> {
+            writeResponse(response, HttpResponseStatus.FOUND);
+            response.putHeader("Location", "/ui/host/gameStats/");
+            response.end();
+        });
+    }
+
     public void setCaptainFromForm(final RoutingContext ctx) {
         HttpServerResponse response = ctx.response();
         ctx.request().setExpectMultipart(true);

@@ -23,6 +23,11 @@ $(document).ready(function() {
 		$("#teamStatsForm").show();
 	});
 	
+	$("#gameStatsButton").click(function () {
+		$(".form").hide();
+		$("#gameStatsForm").show();
+	});
+	
 	$("#captainButton").click(function () {
 		$(".form").hide();
 		$("#captainForm").show();

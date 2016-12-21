@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,6 @@ import java.util.stream.Collectors;
 
 import com.manorllc.beerRate.db.Database;
 import com.manorllc.beerRate.db.DatabaseQueries;
-import com.manorllc.beerRate.db.DbTeam;
 import com.manorllc.beerRate.db.DbUser;
 import com.manorllc.beerRate.model.Beer;
 import com.manorllc.beerRate.model.Generation;
@@ -256,6 +256,64 @@ public class UiHandlers {
 
     }
 
+    public void gameStats(final RoutingContext ctx) {
+        List<Team> teams = db.getTeams();
+        Map<String, Integer> gameOneTotals = new HashMap<>();
+        Map<String, Integer> gameTwoTotals = new HashMap<>();
+
+        for (Team team : teams) {
+            List<DbUser> users = sortUsers(db.getUsersForTeam(team.getName()));
+            Set<String> userNames = users.stream().map(dbUser -> {
+                return Utils.getFullName(dbUser.getFirstName(),
+                        dbUser.getLastName());
+            }).collect(Collectors.toSet());
+
+            Map<String, Integer> allGameOneStats = queries.getGameOneStats();
+            Map<String, Integer> gameOneTeamStats = new HashMap<>();
+            int gameOneTotal = 0;
+            for (Entry<String, Integer> userCount : allGameOneStats.entrySet()) {
+                if (userNames.contains(userCount.getKey())) {
+                    gameOneTeamStats.put(userCount.getKey(), userCount.getValue());
+                    gameOneTotal += userCount.getValue();
+                }
+            }
+            gameOneTotals.put(team.getName(), gameOneTotal);
+
+            Map<String, Integer> allGameTwoStats = queries.getGameTwoStats();
+            Map<String, Integer> gameTwoTeamStats = new HashMap<>();
+            int gameTwoTotal = 0;
+            for (Entry<String, Integer> userCount : allGameTwoStats.entrySet()) {
+                if (userNames.contains(userCount.getKey())) {
+                    gameTwoTeamStats.put(userCount.getKey(), userCount.getValue());
+                    gameTwoTotal += userCount.getValue();
+                }
+            }
+            gameTwoTotals.put(team.getName(), gameTwoTotal);
+        }
+
+        // Sort by most rankings to least
+        List<Team> gameOneTeams = sortTeams(teams, (t1, t2) -> {
+            return (gameOneTotals.get(t2.getName()).compareTo(gameOneTotals.get(t1.getName())));
+        });
+        ctx.put("gameOneTeams", gameOneTeams);
+        ctx.put("gameOneTotals", gameOneTotals);
+
+        List<Team> gameTwoTeams = sortTeams(teams, (t1, t2) -> {
+            return (gameOneTotals.get(t1.getName()).compareTo(gameOneTotals.get(t2.getName())));
+        });
+        ctx.put("gameTwoTeams", gameTwoTeams);
+        ctx.put("gameTwoTotals", gameTwoTotals);
+
+        templateEngine.render(ctx, "templates/gameStats.html", res -> {
+            if (res.succeeded()) {
+                ctx.response().end(res.result());
+            } else {
+                ctx.fail(res.cause());
+            }
+        });
+
+    }
+
     private void writeResponse(final HttpServerResponse response, final HttpResponseStatus status) {
         response.setStatusCode(status.code());
         response.setStatusMessage(status.reasonPhrase());
@@ -273,13 +331,11 @@ public class UiHandlers {
         return users;
     }
 
-    private List<DbTeam> sortTeams(final Collection<DbTeam> teamCollection) {
-        List<DbTeam> teams = teamCollection
+    private List<Team> sortTeams(final Collection<Team> teamCollection, Comparator<Team> comp) {
+        List<Team> teams = teamCollection
                 .stream()
                 .collect(Collectors.toList());
-        teams.sort((t1, t2) -> {
-            return (t1.getName().compareTo(t2.getName()));
-        });
+        teams.sort(comp);
         return teams;
     }
 

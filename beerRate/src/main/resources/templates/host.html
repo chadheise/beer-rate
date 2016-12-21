@@ -31,11 +31,11 @@
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>
 
-		<p id="addTeamButton" class="button">Add Team</p>
+		<!-- <p id="addTeamButton" class="button">Add Team</p>
 		<form id="addTeamForm" class="form" method="post" action="/forms/addTeam">
 			<span>Team Name:</span><input name="teamName" type="text"></input> <input type="submit" data-inline="true"
 				value="Submit" class="ui-btn">
-		</form>
+		</form> -->
 
 		<p id="changeTeamButton" class="button">Change Team</p>
 		<form id="changeTeamForm" class="form" method="post" action="/forms/changeTeam">
@@ -53,6 +53,11 @@
 				<option th:each="team : ${teams}" th:text="${team.name}">Team</option>
 			</select> <input type="submit" data-inline="true" value="Submit" class="ui-btn">
 		</form>
+		
+		<p id="gameStatsButton" class="button">Game Stats</p>
+        <form id="gameStatsForm" class="form" method="post" action="/forms/gameStats">
+            <input type="submit" data-inline="true" value="Submit" class="ui-btn">
+        </form>
 
 		<p id="captainButton" class="button">Set Team Captain</p>
 		<form id="captainForm" class="form" method="post" action="/forms/captain">
