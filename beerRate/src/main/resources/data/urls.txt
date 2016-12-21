@@ -1,0 +1,32 @@
+Belgian Ales 4F81BD
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Chimay%20Premiere%20%28Red%29
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Duvel
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/St.%20Bernardus%20Abt%2012
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Tripel%20Karmeliet
+
+Lagers & Pilsners C0504D
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Michelob
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Pilsner%20Urquell
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Winter%20Skal
+
+Pale Ales 9BBB59
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Field%20To%20Ferment%3A%20Simcoe
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Goose%20IPA
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Very%20Bad%20Elf%20Ale
+
+Sours & Fruits 8064A2
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Kriek
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Monks%20Cafe%20Flemish%20Sour%20Ale
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Peche
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Woodchuck%20Amber%20Hard%20Cider
+
+Stouts & Porters 4BACC6
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Christmas%20Bomb%21
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Edmund%20Fitzgerald%20Porter
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Guinness%20Draught
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Moo%20Joos%20Oatmeal%20Milk%20Stout
+
+Wheat F69646
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Heiseweisen
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/Little%20Sumpin%20Sumpin%20Ale
+http://beerychristmas.us-west-2.elasticbeanstalk.com/ui/rate/White
