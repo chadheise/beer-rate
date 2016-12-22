@@ -308,7 +308,7 @@ public class UiHandlers {
         ctx.put("gameOneTotals", gameOneTotals);
 
         List<Team> gameTwoTeams = sortTeams(teams, (t1, t2) -> {
-            return (gameOneTotals.get(t2.getName()).compareTo(gameOneTotals.get(t1.getName())));
+            return (gameTwoTotals.get(t2.getName()).compareTo(gameTwoTotals.get(t1.getName())));
         });
         ctx.put("gameTwoTeams", gameTwoTeams);
         ctx.put("gameTwoTotals", gameTwoTotals);
