@@ -41,27 +41,36 @@ public class UiHandlers {
 
     public void rateBeer(final RoutingContext routingContext) {
         String beerName = routingContext.request().getParam(HttpConstants.PARAM_BEER);
-        // Add beer directly for easier access in template
-        routingContext.put("beer", beerName);
 
-        List<DbUser> users = sortUsers(db.getUsersByTeam().values()
-                .stream()
-                .flatMap(teamCollection -> teamCollection.stream())
-                .collect(Collectors.toList()));
-        users.sort((u1, u2) -> {
-            String full1 = u1.getLastName() + u1.getFirstName();
-            String full2 = u2.getLastName() + u2.getFirstName();
-            return (full1.compareTo(full2));
-        });
-        routingContext.put("users", users);
+        Optional<Beer> beerOpt = db.getBeer(beerName);
 
-        templateEngine.render(routingContext, "templates/rateBeer.html", res -> {
-            if (res.succeeded()) {
-                routingContext.response().end(res.result());
-            } else {
-                routingContext.fail(res.cause());
-            }
-        });
+        if (beerOpt.isPresent()) {
+            Beer beer = beerOpt.get();
+            // Add beer directly for easier access in template
+            routingContext.put("beer", beer);
+
+            List<DbUser> users = sortUsers(db.getUsersByTeam().values()
+                    .stream()
+                    .flatMap(teamCollection -> teamCollection.stream())
+                    .collect(Collectors.toList()));
+            users.sort((u1, u2) -> {
+                String full1 = u1.getLastName() + u1.getFirstName();
+                String full2 = u2.getLastName() + u2.getFirstName();
+                return (full1.compareTo(full2));
+            });
+            routingContext.put("users", users);
+
+            templateEngine.render(routingContext, "templates/rateBeer.html", res -> {
+                if (res.succeeded()) {
+                    routingContext.response().end(res.result());
+                } else {
+                    routingContext.fail(res.cause());
+                }
+            });
+        } else {
+            writeResponse(routingContext.response(), HttpResponseStatus.BAD_REQUEST);
+            routingContext.response().end(String.format("Beer %s does not exist", beerName));
+        }
     }
 
     public void beerStats(final RoutingContext routingContext) {

@@ -33,8 +33,7 @@
 		<div>
 			<form id="newRatingForm" method="post" action="/forms/ratings">
 				<label for="rating" class="block">Rating:</label>
-				<!--   <p th:each="users : ${users}" th:text="${users.firstName}">A Smoke Test</p>-->
-				<input type="hidden" name="beer" th:value="${beer}">
+				<input type="hidden" name="beer" th:value="${beer.name}">
 				<select name="user">
 				   <option selected disabled>Select user</option>
 				   <option th:each="users : ${users}" th:text="|${users.lastName}, ${users.firstName}|">User</option>

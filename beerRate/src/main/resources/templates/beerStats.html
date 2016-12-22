@@ -28,9 +28,11 @@
 		<h1 class="block" th:text="${beer}">Beer
 			name not found</h1>
 		<div id=results>
-			<span th:text="|Your rating: ${rating}|">Your rating:</span>
-			<span th:text="|Average rating: ${stats.mean}|">Average rating:</span>
-			<span th:text="|Number of ratings: ${stats.count}|">Number of ratings:</span>
+		    <ul>
+		      <li th:text="|Your rating: ${rating}|">Your rating:</li>
+              <li th:text="|Average rating: ${stats.mean}|">Average rating:</li>
+              <li th:text="|Number of ratings: ${stats.count}|">Number of ratings:</li>
+		    </ul>
 		</div>
 	</div>
 </body>
