@@ -1,0 +1,1 @@
+th:if="${not beerData.key.equals('stats')}"
