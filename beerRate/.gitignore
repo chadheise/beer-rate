@@ -2,6 +2,7 @@
 .classpath
 .project
 /target
+/src/main/resources/data/*
 .DS_Store
 .metadata
 # Elastic Beanstalk Files
